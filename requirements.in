@@ -1,0 +1,14 @@
+pre-commit
+structlog
+
+pytest
+pytest-asyncio
+
+bcrypt
+
+fastapi
+uvicorn[standard]
+pydantic[email]
+asyncpg
+
+cosmos @ git+https://github.com/bgswe/cosmos

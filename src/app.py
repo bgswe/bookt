@@ -18,7 +18,7 @@ app = FastAPI()
 @app.on_event("startup")
 async def create_database_pool():
     app.pool = await asyncpg.create_pool(
-        database='postgres',
+        database='saas_application',
         user='postgres',
     )
 

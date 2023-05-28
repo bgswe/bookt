@@ -74,7 +74,7 @@ async def test_organization_creation_includes_default_admin(make_organization):
     user = org.users.pop()
 
     assert user.email == email
-    assert Role.OFFICE_ADMIN in user.roles
+    assert Role.SUPERUSER in user.roles
 
 
 @pytest.mark.asyncio

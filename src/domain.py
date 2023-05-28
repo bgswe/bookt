@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import StrEnum, auto
 from typing import List
 from uuid import UUID
 
@@ -6,11 +6,9 @@ import bcrypt
 from cosmos.domain import AggregateRoot, Entity
 
 
-class Role(Enum):
-    INSPECTOR = "inspector"
-    OFFICE = "office"
-    OFFICE_ADMIN = "office_admin"
-
+class Role(StrEnum):
+    USER = auto()
+    SUPERUSER = auto()
 
 class User(Entity):
     email: str
@@ -31,9 +29,9 @@ class User(Entity):
         last_name: str = None,
     ):
         if roles is None:
-            roles = [Role.OFFICE]
+            roles = [Role.USER]
 
-        hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(10))
+        hashed_password = str(bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(10)))
 
         return Entity.create_entity(
             cls=cls,
@@ -57,14 +55,14 @@ class Organization(AggregateRoot):
         *,
         id: UUID = None,
         name: str,
-        address: str,
+        address: str = None,
         admin_email: str,
         admin_password: str,
     ):
         initial_user = User.create(
             email=admin_email,
             password=admin_password,
-            roles=[Role.OFFICE_ADMIN],
+            roles=[Role.SUPERUSER],
         )
 
         return Entity.create_entity(

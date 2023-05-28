@@ -10,7 +10,7 @@ from domain import Organization
 class CreateOrganization(Command):
     organization_id: UUID | None = None
     organization_name: str
-    organization_address: str
+    organization_address: str | None = None
     admin_email: EmailStr
     admin_password: str
 

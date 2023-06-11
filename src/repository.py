@@ -47,4 +47,5 @@ class OrganizationRepository(AsyncPGRepository):
             organization.name,
         )
 
-
+    async def _get(self, id: UUID):
+        ...

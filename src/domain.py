@@ -31,7 +31,8 @@ class User(Entity):
         if roles is None:
             roles = [Role.USER]
 
-        hashed_password = str(bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(10)))
+        hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(10))
+        hashed_password = hashed_password.decode("utf-8")
 
         return Entity.create_entity(
             cls=cls,

@@ -6,6 +6,7 @@ pytest-asyncio
 httpx
 
 bcrypt
+PyJWT
 
 fastapi
 uvicorn[standard]

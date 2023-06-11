@@ -1,7 +1,9 @@
 import asyncio
+import time
 
 import asyncpg
 import bcrypt
+import jwt
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from cosmos.message_bus import MessageBus, Message
@@ -58,7 +60,7 @@ async def root(command: Signup):
 
     await app_handle(message=command)
 
-    return {"status": "success", "message": "signup initiated"}
+    return {"message": "signup initiated"}
 
 
 @app.post("/command/login/")
@@ -97,14 +99,20 @@ async def login(command: Login):
 
         if not is_correct:
             raise failed_auth_exception
+        
+        access_token = jwt.encode(
+            {
+                "client_id": str(user["id"]),
+                "expires": time.time() + 600,  # 10 minutes
+            },
+            "secret",
+            algorithm="HS256",
+        )
+
         # TODO: Generate and return valid JWT access token
         # TODO: Set httpOnly cookie containing refresh token
         return {
-            "status": "success",
-            "message": "login succesful",
-            "data": {
-                "access_token": "foobar",
-            },
+            "access_token": access_token,
         }
 
         

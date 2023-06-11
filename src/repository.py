@@ -37,15 +37,14 @@ class OrganizationRepository(AsyncPGRepository):
         await self.connection.execute(
             """
             INSERT INTO organization
-                (id, created_at, updated_at, name, address)
+                (id, created_at, updated_at, name)
             VALUES
-                ($1, $2, $3, $4, $5);
+                ($1, $2, $3, $4);
             """,
             organization.id,
             now,
             now,
             organization.name,
-            organization.address,
         )
 
 

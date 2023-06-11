@@ -46,7 +46,6 @@ class User(Entity):
 
 class Organization(AggregateRoot):
     name: str
-    address: str
     users: List[User]
 
     @classmethod
@@ -55,7 +54,6 @@ class Organization(AggregateRoot):
         *,
         id: UUID = None,
         name: str,
-        address: str = None,
         admin_email: str,
         admin_password: str,
     ):
@@ -69,6 +67,5 @@ class Organization(AggregateRoot):
             cls=cls,
             id=id,
             name=name,
-            address=address,
             users=[initial_user],
         )

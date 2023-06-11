@@ -3,6 +3,7 @@ structlog
 
 pytest
 pytest-asyncio
+httpx
 
 bcrypt
 

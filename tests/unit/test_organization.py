@@ -11,6 +11,8 @@ class MockOrganizationRepository(AsyncRepository):
     def __init__(self):
         self.repo = {}
 
+        super().__init__()
+
     async def _add(self, agg: Organization):
         self.repo[agg.id] = agg
 
@@ -33,9 +35,6 @@ def make_organization(make_mock_uow):
                 client_id=dummy_client_id,
                 organization_id=uuid,
                 organization_name=kwargs.get("name", "Some Company LLC."),
-                organization_address=kwargs.get(
-                    "address", "1234 East Main Street, 00000, City, State"
-                ),
                 admin_email=kwargs.get("admin_email", "johndoe@example.com"),
                 admin_password=kwargs.get("admin_password", "password"),
             ),
@@ -53,7 +52,6 @@ async def test_information_requirements(make_organization):
     kwargs = {
         "id": uuid4(),
         "name": "Some Company LLC.",
-        "address": "1234 East Main Street, 00000, City, State",
     }
 
     org = await make_organization(**kwargs)

@@ -1,7 +1,9 @@
 import asyncio
+from time import sleep
 
 import asyncpg
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from cosmos.message_bus import MessageBus, Message
 from cosmos.unit_of_work import AsyncUnitOfWorkFactory
 from cosmos.contrib.pg.async_uow import AsyncUnitOfWorkPostgres
@@ -15,6 +17,14 @@ asyncio.set_event_loop(loop)
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.on_event("startup")
 async def create_database_pool():
     app.pool = await asyncpg.create_pool(
@@ -25,6 +35,7 @@ async def create_database_pool():
 @app.on_event("shutdown")
 async def close_database_pool():
     await app.pool.close()
+
 
 async def app_handle(message: Message):
     async with app.pool.acquire() as connection:

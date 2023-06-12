@@ -4,7 +4,7 @@ import time
 import asyncpg
 import bcrypt
 import jwt
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from cosmos.message_bus import MessageBus, Message
 from cosmos.unit_of_work import AsyncUnitOfWorkFactory
@@ -64,7 +64,7 @@ async def root(command: Signup):
 
 
 @app.post("/command/login/")
-async def login(command: Login):
+async def login(command: Login, response: Response):
     """Strange handling here because it's a quick authentication, but users live inside 
     organization AggregateRoot. It's also not a mutation, so it's more like a view,
     than like a command. This implementation should serve all login needs, can revisit 
@@ -108,6 +108,16 @@ async def login(command: Login):
             "secret",
             algorithm="HS256",
         )
+        refresh_token = jwt.encode(
+            {
+                "client_id": str(user["id"]),
+                "expires": time.time() + 60 * 60 * 24,  # one day
+            },
+            "secret",
+            algorithm="HS256",
+        )
+
+        response.set_cookie("SOME_ENCRYPTED_KEY_VALUE", refresh_token, httponly=True)
 
         # TODO: Generate and return valid JWT access token
         # TODO: Set httpOnly cookie containing refresh token

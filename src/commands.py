@@ -7,11 +7,6 @@ from pydantic import EmailStr
 from domain import Organization
 
 
-class Login(Command):
-    email: str
-    password: str
-
-
 class Signup(Command):
     organization_id: UUID | None = None
     organization_name: str

@@ -70,11 +70,7 @@ async def login(
     response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
 ):
-    """Strange handling here because it's a quick authentication, but users live inside 
-    organization AggregateRoot. It's also not a mutation, so it's more like a view,
-    than like a command. This implementation should serve all login needs, can revisit 
-    at a later date.
-    """
+    """OAuth2 compliant user login"""
 
     async with app.pool.acquire() as connection:
         user = await connection.fetchrow(
@@ -90,7 +86,7 @@ async def login(
         )
 
         failed_auth_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password",
         )
 

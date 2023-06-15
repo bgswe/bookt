@@ -1,7 +1,7 @@
-import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
+from authentication import decode_access_token, ExpiredToken, InvalidToken
 
 jwt_bearer_authentication = OAuth2PasswordBearer(
     tokenUrl="/command/login/",
@@ -10,16 +10,15 @@ jwt_bearer_authentication = OAuth2PasswordBearer(
 
 async def jwt_bearer(token: str = Depends(jwt_bearer_authentication)):
     try:
-        jwt.decode(
-            token.encode("utf-8"), "SOME_SECRET_VALUE", algorithms=["HS256"],
-        )
-    except jwt.ExpiredSignatureError:
+        payload = decode_access_token(token=token)
+
+        return payload
+    except InvalidToken:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="jwt bearer token is expired, acquire a new one through the refresh endpoint",
         )
-    except jwt.InvalidTokenError as e:
-        print(token, e)
+    except ExpiredToken:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="jwt bearer token is invalid, please supply a valid token"

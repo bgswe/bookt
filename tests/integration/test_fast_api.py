@@ -3,11 +3,13 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from app import app
+from app.app import app
 
 
 @pytest.fixture
 def fastapi_client() -> TestClient:
+    app.pool = None
+
     return TestClient(app)
 
 

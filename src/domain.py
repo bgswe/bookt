@@ -10,6 +10,7 @@ class Role(StrEnum):
     USER = auto()
     SUPERUSER = auto()
 
+
 class User(Entity):
     email: str
     first_name: str | None

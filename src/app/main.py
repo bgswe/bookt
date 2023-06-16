@@ -9,14 +9,16 @@ from cosmos.unit_of_work import AsyncUnitOfWorkFactory
 from cosmos.contrib.pg.async_uow import AsyncUnitOfWorkPostgres
 
 from repository import OrganizationRepository
-from commands import Signup, COMMAND_HANDLERS
-from app.routers import authentication
+from commands import COMMAND_HANDLERS
+from app.routers import authentication, organizations
 
 
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
+
 app = FastAPI()
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,8 +32,8 @@ app.add_middleware(
 @app.on_event("startup")
 async def create_database_pool():
     app.pool = await asyncpg.create_pool(
-        database='bookt',
-        user='postgres',
+        database="bookt",
+        user="postgres",
     )
 
 
@@ -48,20 +50,15 @@ async def app_handle(message: Message):
                 repository_cls=OrganizationRepository,
                 uow_kwargs={"connection": connection},
                 repository_kwargs={"connection": connection},
-            ), 
+            ),
             command_handlers=COMMAND_HANDLERS,
         )
 
         await mb.handle(message=message)
 
 
+app.handle = app_handle
+
 app.include_router(authentication.router)
-
-
-@app.post("/command/signup/")
-async def root(command: Signup):
-
-    await app_handle(message=command)
-
-    return {"message": "signup initiated"}
-
+app.include_router(organizations.query_router)
+app.include_router(organizations.signup_router)

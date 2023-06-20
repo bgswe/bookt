@@ -6,10 +6,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from cosmos.message_bus import MessageBus, Message
 from cosmos.unit_of_work import AsyncUnitOfWorkFactory
+from cosmos.repository import AsyncRepository
 from cosmos.contrib.pg.async_uow import AsyncUnitOfWorkPostgres
 
-from repository import OrganizationRepository
-from commands import COMMAND_HANDLERS
+from handlers import COMMAND_HANDLERS, EVENT_HANDLERS
 from app.routers import authentication, organizations
 
 
@@ -47,11 +47,10 @@ async def app_handle(message: Message):
         mb = MessageBus(
             uow_factory=AsyncUnitOfWorkFactory[AsyncUnitOfWorkPostgres](
                 uow_cls=AsyncUnitOfWorkPostgres,
-                repository_cls=OrganizationRepository,
                 uow_kwargs={"connection": connection},
-                repository_kwargs={"connection": connection},
             ),
             command_handlers=COMMAND_HANDLERS,
+            event_handlers=EVENT_HANDLERS,
         )
 
         await mb.handle(message=message)

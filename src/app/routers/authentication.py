@@ -33,7 +33,7 @@ async def login(
             SELECT
                 *
             FROM 
-                usr
+                bookt_user
             WHERE 
                 email = $1;
             """,
@@ -50,7 +50,7 @@ async def login(
 
         if not is_password_correct(
             password=form_data.password,
-            hash=user["password_hash"],
+            hash=user["password"],
         ):
             raise failed_auth_exception
 

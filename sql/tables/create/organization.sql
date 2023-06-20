@@ -1,4 +1,4 @@
-CREATE TABLE organization (
+CREATE TABLE bookt_organization (
     id uuid PRIMARY KEY,
 
     created_at TIMESTAMP NOT NULL,

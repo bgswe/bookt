@@ -5,18 +5,23 @@ from uuid import UUID
 import bcrypt
 from cosmos.domain import AggregateRoot, Entity
 
+from events import OrganizationCreated
+
 
 class Role(StrEnum):
-    USER = auto()
-    SUPERUSER = auto()
+    SAAS_ADMIN = auto()
+    SAAS_SUPPORT = auto()
+    ORGANIZATION_ADMIN = auto()
+    ORGANIZATION_USER = auto()
 
 
-class User(Entity):
+class User(AggregateRoot):
     email: str
     first_name: str | None
     last_name: str | None
     roles: List[Role]
     hashed_password: str
+    organization_id: str
 
     @classmethod
     def create(
@@ -25,12 +30,13 @@ class User(Entity):
         id: UUID = None,
         email: str,
         password: str,
+        organization_id: UUID,
         roles: List[Role] = None,
         first_name: str = None,
         last_name: str = None,
     ):
         if roles is None:
-            roles = [Role.USER]
+            roles = [Role.ORGANIZATION_ADMIN]
 
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(10))
         hashed_password = hashed_password.decode("utf-8")
@@ -39,16 +45,16 @@ class User(Entity):
             cls=cls,
             id=id,
             email=email,
-            hashed_password=hashed_password,
+            password=hashed_password,
             first_name=first_name,
             last_name=last_name,
             roles=roles,
+            organization_id=organization_id,
         )
 
 
 class Organization(AggregateRoot):
     name: str
-    users: List[User]
 
     @classmethod
     def create(
@@ -57,17 +63,19 @@ class Organization(AggregateRoot):
         id: UUID = None,
         name: str,
         admin_email: str,
-        admin_password: str,
     ):
-        initial_user = User.create(
-            email=admin_email,
-            password=admin_password,
-            roles=[Role.SUPERUSER],
-        )
-
-        return Entity.create_entity(
+        organization = Entity.create_entity(
             cls=cls,
             id=id,
             name=name,
-            users=[initial_user],
         )
+
+        organization.new_event(
+            OrganizationCreated(
+                organization_id=organization.id,
+                organization_name=organization.name,
+                admin_email=admin_email,
+            )
+        )
+
+        return organization

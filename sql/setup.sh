@@ -7,7 +7,7 @@ psql -U postgres -c "$SQL"
 # sql scripts to be ran, in order, to setup initial database
 SCRIPTS=(
     extensions/uuid_ossp
-    tables/create/usr
+    tables/create/user
     tables/create/organization
     # tables/create/inspection_schedule_configuration
     # tables/create/customer

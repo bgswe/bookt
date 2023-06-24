@@ -87,6 +87,19 @@ async def refresh(refresh_token: Annotated[str, Cookie()]):
         )
 
 
+@router.post("/logout")
+async def logout(refresh_token: Annotated[str, Cookie()], response: Response):
+    """Revokes refresh token to end user's session
+
+    refresh_token cookie declared such that a 422 response is returned if it
+    does not exist on the incoming request.
+    """
+
+    response.delete_cookie("refresh_token")
+
+    return {"detail": "user logged out"}
+
+
 @router.get("/dummyneedsauth")
 async def dummyneedsauth(payload=Depends(jwt_bearer)):
     print(payload)

@@ -1,10 +1,10 @@
-from abc import ABC
 from datetime import datetime as dt
 from uuid import UUID
 
 from cosmos.contrib.pg.async_uow import AsyncPGRepository
 
 from domain import Organization, User
+from settings import APPLICATION_NAME
 
 
 class UserRepository(AsyncPGRepository):
@@ -12,8 +12,8 @@ class UserRepository(AsyncPGRepository):
         now = dt.now()
 
         await self.connection.execute(
-            """
-            INSERT INTO bookt_user
+            f"""
+            INSERT INTO {APPLICATION_NAME}_user
                 (id, created_at, updated_at, organization_id, email, password, first_name, last_name)
             VALUES
                 ($1, $2, $3, $4, $5, $6, $7, $8);
@@ -34,8 +34,8 @@ class OrganizationRepository(AsyncPGRepository):
         now = dt.now()
 
         await self.connection.execute(
-            """
-            INSERT INTO bookt_organization
+            f"""
+            INSERT INTO {APPLICATION_NAME}_organization
                 (id, created_at, updated_at, name)
             VALUES
                 ($1, $2, $3, $4);

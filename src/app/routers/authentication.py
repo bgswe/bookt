@@ -102,6 +102,8 @@ async def logout(refresh_token: Annotated[str, Cookie()], response: Response):
 
 @router.get("/dummyneedsauth")
 async def dummyneedsauth(payload=Depends(jwt_bearer)):
+    """Serves as a dummy endpoint wh/ requires auth, providing coverage to the auth flow"""
+
     print(payload)
 
-    return {"detail": "success"}
+    return {"detail": "dummy success"}

@@ -1,17 +1,15 @@
 import asyncio
 
 import asyncpg
-
+from cosmos.contrib.pg.async_uow import AsyncUnitOfWorkPostgres
+from cosmos.contrib.redis import get_redis_client, redis_publisher
+from cosmos.message_bus import Message, MessageBus
+from cosmos.unit_of_work import AsyncUnitOfWorkFactory
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from cosmos.message_bus import MessageBus, Message
-from cosmos.unit_of_work import AsyncUnitOfWorkFactory
-from cosmos.repository import AsyncRepository
-from cosmos.contrib.pg.async_uow import AsyncUnitOfWorkPostgres
 
-from handlers import COMMAND_HANDLERS, EVENT_HANDLERS
 from app.routers import authentication, organizations
-
+from handlers import COMMAND_HANDLERS, EVENT_HANDLERS
 
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
@@ -51,6 +49,7 @@ async def app_handle(message: Message):
             ),
             command_handlers=COMMAND_HANDLERS,
             event_handlers=EVENT_HANDLERS,
+            event_publish=redis_publisher(client=get_redis_client()),
         )
 
         await mb.handle(message=message)

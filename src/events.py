@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from cosmos.domain import Event
 
 

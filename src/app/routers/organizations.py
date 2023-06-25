@@ -1,9 +1,9 @@
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, Request
+
 from app.dependencies import jwt_bearer
-
 from commands import Signup
-
 
 signup_router = APIRouter(
     prefix="/command",

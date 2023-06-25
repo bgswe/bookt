@@ -1,8 +1,9 @@
 from typing import Annotated
-from fastapi import APIRouter, Cookie, Depends, Request, Response, status, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-from app.dependencies import jwt_bearer
 
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
+from fastapi.security import OAuth2PasswordRequestForm
+
+from app.dependencies import jwt_bearer
 from authentication import (
     ExpiredToken,
     InvalidToken,
@@ -11,7 +12,7 @@ from authentication import (
     get_refresh_token,
     is_password_correct,
 )
-
+from settings import APPLICATION_NAME
 
 router = APIRouter(
     prefix="/auth",
@@ -29,12 +30,12 @@ async def login(
 
     async with request.app.pool.acquire() as connection:
         user = await connection.fetchrow(
-            """
+            f"""
             SELECT
                 *
-            FROM 
-                bookt_user
-            WHERE 
+            FROM
+                {APPLICATION_NAME}_user
+            WHERE
                 email = $1;
             """,
             form_data.username,

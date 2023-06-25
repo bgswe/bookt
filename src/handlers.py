@@ -1,6 +1,6 @@
 from cosmos.contrib.pg.async_uow import AsyncUnitOfWorkPostgres
-from commands import Signup
 
+from commands import Signup
 from domain import Organization, User
 from events import OrganizationCreated
 from repository import OrganizationRepository, UserRepository

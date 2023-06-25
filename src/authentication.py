@@ -1,7 +1,7 @@
 from time import time
 from uuid import UUID
-import bcrypt
 
+import bcrypt
 import jwt
 
 import settings
@@ -15,7 +15,7 @@ class InvalidToken(Exception):
     ...
 
 
-def get_access_token(client_id: UUID|str):
+def get_access_token(client_id: UUID | str):
     return jwt.encode(
         {
             "exp": time() + int(settings.ACCESS_TOKEN_DURATION),
@@ -29,7 +29,7 @@ def get_access_token(client_id: UUID|str):
 def decode_access_token(token: str):
     try:
         return jwt.decode(
-            token.encode("utf-8"), 
+            token.encode("utf-8"),
             settings.ACCESS_TOKEN_SECRET,
             algorithms=[settings.HASH_ALGORITHM],
         )
@@ -53,7 +53,7 @@ def get_refresh_token(client_id: UUID):
 def decode_refresh_token(token: str):
     try:
         return jwt.decode(
-            token.encode("utf-8"), 
+            token.encode("utf-8"),
             settings.REFRESH_TOKEN_SECRET,
             algorithms=[settings.HASH_ALGORITHM],
         )

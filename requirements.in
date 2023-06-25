@@ -10,6 +10,7 @@ PyJWT
 
 python-multipart
 fastapi
+redis
 uvicorn[standard]
 pydantic[email]
 asyncpg

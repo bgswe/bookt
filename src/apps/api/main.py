@@ -1,15 +1,20 @@
 import asyncio
+from typing import Dict, List
 
 import asyncpg
-from cosmos.contrib.pg.async_uow import AsyncUnitOfWorkPostgres
-from cosmos.contrib.redis import get_redis_client, redis_publisher
-from cosmos.message_bus import Message, MessageBus
-from cosmos.unit_of_work import AsyncUnitOfWorkFactory
+from app.routers import accounts, authentication
+from cosmos.contrib.pg.async_uow import (
+    PostgresEventStore,
+    PostgresOutbox,
+    PostgresUnitOfWork,
+)
+from cosmos.domain import Event, Message
+from cosmos.repository import AggregateReplay
+from dependency_injector import containers, providers
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from app.routers import authentication, organizations
-from handlers import COMMAND_HANDLERS, EVENT_HANDLERS
+from service.command_handlers import COMMAND_HANDLERS
+from service.event_handlers import EVENT_HANDLERS
 
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
@@ -27,19 +32,6 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-async def create_database_pool():
-    app.pool = await asyncpg.create_pool(
-        database="bookt",
-        user="postgres",
-    )
-
-
-@app.on_event("shutdown")
-async def close_database_pool():
-    await app.pool.close()
-
-
 async def app_handle(message: Message):
     async with app.pool.acquire() as connection:
         mb = MessageBus(
@@ -49,7 +41,6 @@ async def app_handle(message: Message):
             ),
             command_handlers=COMMAND_HANDLERS,
             event_handlers=EVENT_HANDLERS,
-            event_publish=redis_publisher(client=get_redis_client()),
         )
 
         await mb.handle(message=message)
@@ -58,5 +49,5 @@ async def app_handle(message: Message):
 app.handle = app_handle
 
 app.include_router(authentication.router)
-app.include_router(organizations.query_router)
-app.include_router(organizations.signup_router)
+app.include_router(accounts.query_router)
+app.include_router(accounts.command_router)

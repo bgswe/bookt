@@ -1,5 +1,5 @@
 import asyncio
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from cosmos.contrib.pg.containers import PostgresDomainContainer
 
@@ -13,6 +13,7 @@ async def main():
     # them into the service layer command, and event handlers
 
     command = Register(
+        message_id=uuid4(),
         account_id=uuid4(),
         originator_email="email@example.com",
     )
@@ -23,7 +24,8 @@ async def main():
 if __name__ == "__main__":
     container = PostgresDomainContainer()
 
-    container.config.from_yaml("./apps/domain/config.yaml")
+    # TODO: this path is likely to break
+    container.config.from_yaml("./message-handler/config.yaml")
     container.config.event_hydration_mapping.from_dict(
         {
             "AccountCreated": AccountCreated,

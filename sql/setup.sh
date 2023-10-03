@@ -9,7 +9,8 @@ SCRIPTS=(
     extensions/uuid_ossp
     tables/create/event
     tables/create/message_outbox
-    tables/create/received_messages
+    tables/create/acked_messages
+    tables/create/processed_messages
 )
 
 # iterate through each script and apply it to the database

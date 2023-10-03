@@ -1,4 +1,4 @@
-CREATE TABLE handled_messages
+CREATE TABLE processed_messages
 (
     id        UUID PRIMARY KEY
 );

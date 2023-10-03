@@ -9,10 +9,6 @@ bcrypt
 PyJWT
 
 dependency-injector
-python-multipart
-fastapi
-redis
-uvicorn[standard]
 pydantic[email]
 asyncpg
 

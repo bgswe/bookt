@@ -1,0 +1,26 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Message Handler",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/src",
+      "module": "message-handler.main",
+      "python": "./message-handler/venv/bin/python",
+      "justMyCode": false
+    },
+    {
+      "name": "Transactional Outbox Main",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/src",
+      "module": "transactional-outbox.main",
+      "python": "transactional-outbox/venv/bin/python",
+      "justMyCode": false
+    }
+  ]
+}

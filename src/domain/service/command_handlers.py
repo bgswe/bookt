@@ -1,10 +1,11 @@
 from cosmos import UnitOfWork, command
+from cosmos.unit_of_work import UnitOfWork
 
 from domain.model import Account
 from domain.service.commands import Register
 
 
-@command(command_type=Register)
+@command
 async def handle_registration(
     uow: UnitOfWork,
     command: Register,

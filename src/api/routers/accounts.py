@@ -1,7 +1,6 @@
 from app.dependencies import jwt_bearer
-from fastapi import APIRouter, Depends, Request
-
 from apps.domain.service.commands import Register
+from fastapi import APIRouter, Depends, Request
 
 command_router = APIRouter(
     prefix="/command",

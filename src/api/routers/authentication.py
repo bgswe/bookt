@@ -1,17 +1,10 @@
 from typing import Annotated
 
-from app.dependencies import jwt_bearer
-from app.settings import APPLICATION_NAME
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
-from service.authentication import (
-    ExpiredToken,
-    InvalidToken,
-    decode_refresh_token,
-    get_access_token,
-    get_refresh_token,
-    is_password_correct,
-)
+
+from api.dependencies import jwt_bearer
+from settings import APPLICATION_NAME
 
 router = APIRouter(
     prefix="/auth",

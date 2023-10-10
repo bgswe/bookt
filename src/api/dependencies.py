@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from service.authentication import ExpiredToken, InvalidToken, decode_access_token
+
+from domain.model.authentication import ExpiredToken, InvalidToken, decode_access_token
 
 jwt_bearer_authentication = OAuth2PasswordBearer(
     tokenUrl="/command/login/",

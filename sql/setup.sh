@@ -9,7 +9,6 @@ SCRIPTS=(
     extensions/uuid_ossp
     tables/create/event
     tables/create/message_outbox
-    tables/create/acked_messages
     tables/create/processed_messages
 )
 

@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+confluent-kafka
+bcrypt
+PyJWT
+cosmos @ git+https://github.com/bgswe/cosmos
+dependency-injector
+pydantic[email]
+python-multipart

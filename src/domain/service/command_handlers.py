@@ -1,5 +1,5 @@
 from cosmos import UnitOfWork, command
-from cosmos.unit_of_work import UnitOfWork
+from cosmos.domain import Command
 
 from domain.model import Account
 from domain.service.commands import Register
@@ -25,3 +25,8 @@ async def handle_registration(
 COMMAND_HANDLERS = {
     "Register": handle_registration,
 }
+
+
+async def handle_command(command: Command):
+    if isinstance(command, Register):
+        await handle_registration(command=command)

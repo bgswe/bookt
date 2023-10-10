@@ -27,13 +27,9 @@ def main():
                     cursor.execute(
                         f"""
                         INSERT INTO
-                            acked_messages
-                        SELECT
-                            *
-                        FROM
-                            message_outbox
-                        WHERE
-                            id = '{key}'
+                            processed_messages (id)
+                        VALUES
+                            ('{key}');
                     """,
                     )
 
@@ -73,15 +69,11 @@ def main():
                         if message_id in pending_messages:
                             continue
 
-                        m = {
-                            "id": message_id,
-                            "message_type": "event",
-                            "type": m[columns["type"]],
-                            "data": m[columns["data"]],
-                        }
-
                         producer.produce(
-                            "messages", key=message_id, value=str(m), callback=acked
+                            "messages",
+                            key=message_id,
+                            value=m[columns["message"]].tobytes(),
+                            callback=acked,
                         )
 
                         pending_messages.add(message_id)

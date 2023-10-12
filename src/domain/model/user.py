@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+from enum import StrEnum, auto
 from typing import List
 from uuid import UUID
 
 import bcrypt
 from cosmos.domain import AggregateRoot, DomainEvent
+
+
+class UserRoles(StrEnum):
+    APP_ADMIN = auto()
+    ACCOUNT_ADMIN = auto()
+    ACCOUNT_USER = auto()
 
 
 class User(AggregateRoot):
@@ -13,19 +20,30 @@ class User(AggregateRoot):
             self._apply_create(event=event)
 
     def create(
-        self, *, id: UUID = None, email: str, roles: List[str], first_name: str = None
+        self,
+        *,
+        id: UUID = None,
+        account_id: UUID,
+        email: str,
+        roles: List[UserRoles],
+        first_name: str = None,
+        last_name: str = None,
     ):
         """Entry point into account creation"""
 
         self.mutate(
             event=UserCreated(
                 stream_id=id,
+                account_id=account_id,
                 email=email,
+                roles=roles,
+                first_name=first_name,
+                last_name=last_name,
             )
         )
 
     def _apply_create(self, event: UserCreated):
-        """Call AggregateRoot.__init__ with the attributes of the Account"""
+        """Initialize a new instance of the User aggregate root"""
 
         random_password = "password"
         hashed_password = bcrypt.hashpw(
@@ -35,7 +53,10 @@ class User(AggregateRoot):
 
         self._initialize(
             id=event.stream_id,
+            account_id=event.account_id,
             email=event.email,
+            first_name=event.first_name,
+            last_name=event.last_name,
             hashed_password=hashed_password,
         )
 
@@ -43,6 +64,6 @@ class User(AggregateRoot):
 class UserCreated(DomainEvent):
     account_id: UUID
     email: str
-    roles: List[str]
-    first_name: str = None
-    last_name: str = None
+    roles: List[UserRoles]
+    first_name: str | None = None
+    last_name: str | None = None

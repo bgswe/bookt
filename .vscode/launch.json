@@ -10,7 +10,7 @@
       "request": "launch",
       "cwd": "${workspaceFolder}/src",
       "module": "message-handler.main",
-      "python": "./message-handler/venv/bin/python",
+      "python": "${command:python.interpreterPath}",
       "justMyCode": false
     },
     {
@@ -19,7 +19,7 @@
       "request": "launch",
       "cwd": "${workspaceFolder}/src",
       "module": "transactional-outbox.main",
-      "python": "transactional-outbox/venv/bin/python",
+      "python": "${command:python.interpreterPath}",
       "justMyCode": false
     }
   ]

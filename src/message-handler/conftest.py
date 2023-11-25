@@ -13,7 +13,7 @@ from domain.service.event_handlers import EVENT_HANDLERS
 
 class MockProducer:
     def __init__(self, container):
-        self._container = container
+        self.container = container
         self._queue = []
         self._uow = None
 
@@ -27,7 +27,7 @@ class MockProducer:
                 handlers = EVENT_HANDLERS.get(current_message.name)
                 if handlers is not None:
                     for handler in handlers:
-                        self._uow = self._container.unit_of_work()
+                        self._uow = self.container.unit_of_work()
                         await handler(uow=self._uow, event=current_message)
                         self._collect_events()
                         self._uow = None
@@ -35,7 +35,7 @@ class MockProducer:
             elif isinstance(current_message, Command):
                 handler = COMMAND_HANDLERS.get(current_message.name)
                 if handler is not None:
-                    self._uow = self._container.unit_of_work()
+                    self._uow = self.container.unit_of_work()
                     await handler(uow=self._uow, command=current_message)
                     self._collect_events()
                     self._uow = None

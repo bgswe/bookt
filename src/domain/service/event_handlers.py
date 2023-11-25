@@ -17,7 +17,7 @@ async def create_originator_user(uow: UnitOfWork, event: AccountCreated):
         roles=[UserRoles.ACCOUNT_ADMIN],
     )
 
-    uow.repository.save(aggregate=user)
+    await uow.repository.save(aggregate=user)
 
 
 EVENT_HANDLERS = {"AccountCreated": [create_originator_user]}

@@ -2,10 +2,17 @@ from __future__ import annotations
 
 from enum import StrEnum, auto
 from typing import List
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import bcrypt
 from cosmos.domain import AggregateRoot, DomainEvent
+from pydantic import Field
+
+
+class UserRoles(StrEnum):
+    APP_ADMIN = auto()
+    ACCOUNT_ADMIN = auto()
+    ACCOUNT_USER = auto()
 
 
 class UserRoles(StrEnum):
@@ -30,6 +37,9 @@ class User(AggregateRoot):
         last_name: str = None,
     ):
         """Entry point into account creation"""
+
+        if id is None:
+            id = uuid4()
 
         self.mutate(
             event=UserCreated(

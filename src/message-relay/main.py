@@ -26,15 +26,6 @@ def main():
                 with conn.cursor() as cursor:
                     cursor.execute(
                         f"""
-                        INSERT INTO
-                            processed_messages (id)
-                        VALUES
-                            ('{key}');
-                    """,
-                    )
-
-                    cursor.execute(
-                        f"""
                         DELETE FROM
                             message_outbox
                         WHERE
@@ -72,7 +63,7 @@ def main():
                         producer.produce(
                             "messages",
                             key=message_id,
-                            value=m[columns["message"]].tobytes(),
+                            value=bytes(m[columns["message"]]),
                             callback=acked,
                         )
 

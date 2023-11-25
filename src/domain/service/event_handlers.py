@@ -2,15 +2,22 @@ from cosmos import UnitOfWork
 from cosmos.decorators import Event, event
 
 from domain.model.account import AccountCreated
+from domain.model.user import User, UserRoles
 
 
 @event
 async def create_originator_user(uow: UnitOfWork, event: AccountCreated):
-    print("Top of create_originator_user")
+    """Create a new user for creator of new account"""
 
-    print("Event:", event)
+    user = User()
 
-    print("Bottom of create_originator_user")
+    user.create(
+        account_id=event.stream_id,
+        email=event.originator_email,
+        roles=[UserRoles.ACCOUNT_ADMIN],
+    )
+
+    await uow.repository.save(aggregate=user)
 
 
 EVENT_HANDLERS = {"AccountCreated": [create_originator_user]}

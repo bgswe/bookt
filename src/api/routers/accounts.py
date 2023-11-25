@@ -13,7 +13,7 @@ command_router = APIRouter(
 
 
 @command_router.post("/register")
-async def register(request: Request, command: Register):
+async def register(command: Register):
     message = pickle.dumps(command)
 
     producer.produce("messages", key=str(command.message_id), value=message)

@@ -21,7 +21,7 @@ class Account(AggregateRoot):
         )
 
     def _apply_create(self, event: AccountCreated):
-        """Call AggregateRoot.__init__ with the attributes of the Account"""
+        """Initialize a new instance of the Account aggregate root"""
 
         self._initialize(
             id=event.stream_id,

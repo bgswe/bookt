@@ -29,17 +29,14 @@ async def main():
             if message is None:
                 continue
 
-            if message.error():
-                print("ERROR")
+            if error := message.error():
+                print("ERROR", error)
             else:
                 import pickle
 
                 message = pickle.loads(message.value())
 
-                print("handle message", type(message))
-
                 if isinstance(message, Event):
-                    print("is event")
                     await handle_event(event=message)
 
                 elif isinstance(message, Command):

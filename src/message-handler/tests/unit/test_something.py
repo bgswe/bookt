@@ -2,16 +2,20 @@ from uuid import uuid4
 
 import pytest
 
-from domain.service.command_handlers import handle_registration
 from domain.service.commands import Register
 
 
 @pytest.mark.asyncio
-async def test_x(producer):
+async def test_register(producer):
+    account_id = uuid4()
+
     command = Register(
-        account_id=uuid4(),
+        account_id=account_id,
         originator_email="example@email.com",
     )
 
     await producer.produce(message=command)
-    print("after produce")
+
+    events = producer.container.outbox()._outbox
+    for e in events:
+        print(e)

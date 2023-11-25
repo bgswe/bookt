@@ -10,7 +10,7 @@ from domain.service.event_handlers import handle_event
 
 conf = {
     "bootstrap.servers": "192.168.0.11:9092",
-    "group.id": "foo",
+    "group.id": "message-handler",
     "auto.offset.reset": "earliest",
 }
 

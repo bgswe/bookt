@@ -2,7 +2,24 @@ import socket
 from time import sleep
 
 import psycopg2
+import structlog
 from confluent_kafka import Producer
+
+from message_relay.settings import (
+    MESSAGE_OUTBOX_DATABASE_HOST,
+    MESSAGE_OUTBOX_DATABASE_NAME,
+    MESSAGE_OUTBOX_DATABASE_PASSWORD,
+    MESSAGE_OUTBOX_DATABASE_USER,
+)
+
+logger = structlog.get_logger()
+
+
+log = logger.bind(MESSAGE_OUTBOX_DATABASE_HOST=MESSAGE_OUTBOX_DATABASE_HOST)
+log = log.bind(MESSAGE_OUTBOX_DATABASE_NAME=MESSAGE_OUTBOX_DATABASE_NAME)
+log = log.bind(MESSAGE_OUTBOX_DATABASE_USER=MESSAGE_OUTBOX_DATABASE_USER)
+
+log.info("starting message-relay application")
 
 
 def main():
@@ -20,7 +37,12 @@ def main():
         if err is not None:
             print("Failed to deliver message: %s: %s" % (str(msg), str(err)))
         else:
-            conn = psycopg2.connect(dbname="bookt", user="postgres", password="")
+            conn = psycopg2.connect(
+                host=MESSAGE_OUTBOX_DATABASE_HOST,
+                dbname=MESSAGE_OUTBOX_DATABASE_NAME,
+                user=MESSAGE_OUTBOX_DATABASE_USER,
+                password=MESSAGE_OUTBOX_DATABASE_PASSWORD,
+            )
 
             with conn:
                 with conn.cursor() as cursor:
@@ -36,7 +58,12 @@ def main():
                     pending_messages.remove(key)
 
     while True:
-        conn = psycopg2.connect(dbname="bookt", user="postgres", password="")
+        conn = psycopg2.connect(
+            host=MESSAGE_OUTBOX_DATABASE_HOST,
+            dbname=MESSAGE_OUTBOX_DATABASE_NAME,
+            user=MESSAGE_OUTBOX_DATABASE_USER,
+            password=MESSAGE_OUTBOX_DATABASE_PASSWORD,
+        )
 
         with conn:
             with conn.cursor() as cursor:

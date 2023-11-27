@@ -1,24 +1,15 @@
 echo --- CREATING DATBASE ---
 
-# initially create database
-SQL=$(envsubst < $ROOT_DIR/sql/database/create.sql)
+# initially create databases
+SQL=$(envsubst < ${ROOT_DIR}/sql/scripts/create_event_store_database.sql)
 psql -U postgres -c "$SQL"
 
-# sql scripts to be ran, in order, to setup initial database
-SCRIPTS=(
-    extensions/uuid_ossp
-    tables/create/event
-    tables/create/message_outbox
-    tables/create/processed_messages
-)
+SQL=$(envsubst < ${ROOT_DIR}/sql/scripts/create_message_outbox_database.sql)
+psql -U postgres -c "$SQL"
 
-# iterate through each script and apply it to the database
-for el in "${SCRIPTS[@]}"
-do
-    :
-    envsubst < "$ROOT_DIR/sql/$el.sql" > tmp.sql
-    psql -U postgres -d $DATABASE -f tmp.sql
-    rm tmp.sql
-done
+psql -U postgres -d ${APPLICATION}_event_store -f ${ROOT_DIR}/sql/scripts/create_event_table.sql
+psql -U postgres -d ${APPLICATION}_event_store -f ${ROOT_DIR}/sql/scripts/create_processed_message_table.sql
+
+psql -U postgres -d ${APPLICATION}_message_outbox -f ${ROOT_DIR}/sql/scripts/create_message_outbox_table.sql
 
 echo --- CREATING DATABASE "(END)" ---

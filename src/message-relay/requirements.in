@@ -1,5 +1,0 @@
-psycopg2-binary
-confluent-kafka
-cosmos @ git+https://github.com/bgswe/cosmos
-pydantic
-dependency_injector

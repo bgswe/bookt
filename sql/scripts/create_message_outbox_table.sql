@@ -1,5 +1,5 @@
 CREATE TABLE message_outbox
 (
-    id        UUID PRIMARY KEY,
+    id        VARCHAR(36) PRIMARY KEY,
     message   BYTEA  NOT NULL
 );

@@ -6,6 +6,7 @@ import structlog
 from confluent_kafka import Producer
 
 from message_relay.settings import (
+    KAFKA_HOST,
     MESSAGE_OUTBOX_DATABASE_HOST,
     MESSAGE_OUTBOX_DATABASE_NAME,
     MESSAGE_OUTBOX_DATABASE_PASSWORD,
@@ -18,16 +19,16 @@ logger = structlog.get_logger()
 log = logger.bind(MESSAGE_OUTBOX_DATABASE_HOST=MESSAGE_OUTBOX_DATABASE_HOST)
 log = log.bind(MESSAGE_OUTBOX_DATABASE_NAME=MESSAGE_OUTBOX_DATABASE_NAME)
 log = log.bind(MESSAGE_OUTBOX_DATABASE_USER=MESSAGE_OUTBOX_DATABASE_USER)
+log = log.bind(KAFKA_HOST=KAFKA_HOST)
 
 log.info("starting message-relay application")
 
 
 def main():
     conf = {
-        "bootstrap.servers": "192.168.0.11:9092",
+        "bootstrap.servers": KAFKA_HOST,
         "client.id": socket.gethostname(),
     }
-    producer = Producer(conf)
 
     pending_messages = set()
 
@@ -35,7 +36,8 @@ def main():
         key = str(msg.key(), encoding="utf-8")
 
         if err is not None:
-            print("Failed to deliver message: %s: %s" % (str(msg), str(err)))
+            log = log.bind(message=str(msg), error=str(err))
+            log.error("failed to deliver message")
         else:
             conn = psycopg2.connect(
                 host=MESSAGE_OUTBOX_DATABASE_HOST,
@@ -81,6 +83,8 @@ def main():
                 messages = cursor.fetchall()
 
                 if messages:
+                    producer = Producer(conf)
+
                     for m in messages:
                         message_id = m[columns["id"]]
 
@@ -95,10 +99,11 @@ def main():
                         )
 
                         pending_messages.add(message_id)
-                else:
-                    print("There are no messages to push")
 
-                producer.poll(1)
+                    producer.poll(1)
+                else:
+                    logger.info("there are no messages to push")
+
                 sleep(1)
 
 

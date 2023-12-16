@@ -8,7 +8,7 @@
       "name": "Message Handler",
       "type": "python",
       "request": "launch",
-      "cwd": "${workspaceFolder}/src",
+      "cwd": "${workspaceFolder}",
       "module": "message-handler.main",
       "python": "${command:python.interpreterPath}",
       "justMyCode": false
@@ -17,7 +17,7 @@
       "name": "Transactional Outbox Main",
       "type": "python",
       "request": "launch",
-      "cwd": "${workspaceFolder}/src",
+      "cwd": "${workspaceFolder}",
       "module": "transactional-outbox.main",
       "python": "${command:python.interpreterPath}",
       "justMyCode": false

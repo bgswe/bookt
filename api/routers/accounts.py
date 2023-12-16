@@ -1,10 +1,10 @@
 import pickle
 
+from domain.service.commands import Register
 from fastapi import APIRouter, Depends, Request
 
 from api.dependencies import jwt_bearer
 from api.producer import producer
-from domain.service.commands import Register
 
 command_router = APIRouter(
     prefix="/command",

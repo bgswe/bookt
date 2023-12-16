@@ -3,7 +3,6 @@ from uuid import UUID
 
 import bcrypt
 import jwt
-
 import settings
 
 

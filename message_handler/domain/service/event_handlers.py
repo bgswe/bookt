@@ -1,8 +1,8 @@
 from cosmos import UnitOfWork
 from cosmos.decorators import Event, event
 
-from domain.model.account import AccountCreated
-from domain.model.user import User, UserRoles
+from message_handler.domain.model.account import AccountCreated
+from message_handler.domain.model.user import User, UserRoles
 
 
 @event

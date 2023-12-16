@@ -1,8 +1,8 @@
 from cosmos import UnitOfWork, command
 from cosmos.domain import Command
 
-from domain.model import Account
-from domain.service.commands import Register
+from message_handler.domain.model import Account
+from message_handler.domain.service.commands import Register
 
 
 @command

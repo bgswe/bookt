@@ -2,9 +2,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
+from settings import APPLICATION_NAME
 
 from api.dependencies import jwt_bearer
-from settings import APPLICATION_NAME
 
 router = APIRouter(
     prefix="/auth",

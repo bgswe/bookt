@@ -12,4 +12,4 @@ dependency-injector
 pydantic[email]
 asyncpg
 confluent-kafka
-cosmos @ git+https://github.com/bgswe/cosmos
+cosmos @ git+ssh://git@github.com/bgswe/cosmos

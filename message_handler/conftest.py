@@ -6,7 +6,6 @@ from cosmos.domain import AggregateRoot, Command, Event, Message
 from cosmos.repository import AggregateRepository
 from cosmos.unit_of_work import UnitOfWork
 from dependency_injector import containers, providers
-
 from domain.service.command_handlers import COMMAND_HANDLERS
 from domain.service.event_handlers import EVENT_HANDLERS
 

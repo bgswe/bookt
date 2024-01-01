@@ -1,11 +1,3 @@
-Include /Users/bg/.colima/ssh_config
-
-Host github.com
-  Hostname github.com
-  IdentityFile ~/.ssh/gh-bgswe
-  IdentitiesOnly yes
-
-
 Host github.com-cosmos
   Hostname github.com
   IdentityFile ~/.ssh/github

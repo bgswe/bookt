@@ -60,6 +60,9 @@ def main():
                     pending_messages.remove(key)
 
     while True:
+        log = logger.bind(pending_messages=str(pending_messages))
+        log.info("top of MR loop")
+
         conn = psycopg2.connect(
             host=DATABASE_HOST,
             dbname=DATABASE_NAME,
@@ -70,11 +73,13 @@ def main():
         with conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    """
+                    f"""
                     SELECT
                         *
                     FROM
                         message_outbox
+                    WHERE
+                        id not in ({",".join(pending_messages)})
                 """
                 )
 
@@ -88,9 +93,6 @@ def main():
                     for m in messages:
                         message_id = m[columns["id"]]
 
-                        if message_id in pending_messages:
-                            continue
-
                         producer.produce(
                             "messages",
                             key=message_id,
@@ -100,11 +102,11 @@ def main():
 
                         pending_messages.add(message_id)
 
-                    producer.poll(1)
+                    producer.poll(0.1)
                 else:
                     logger.info("there are no messages to push")
 
-                sleep(1)
+                sleep(0.1)
 
 
 if __name__ == "__main__":

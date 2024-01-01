@@ -48,14 +48,13 @@ async def main():
         log.info("kafka consumer connected")
 
         consumer.subscribe(["messages"])
-
         logger.info("subscribed to messages topic")
 
         while True:
             message = consumer.poll(timeout=1.0)
             if message is None:
                 log.info("no messages")
-                sleep(1)
+                sleep(0.1)
                 continue
 
             if error := message.error():

@@ -1,4 +1,4 @@
-Current project Notes
+## Current project Notes
 
 - requries local instance of postgres for now
 - runs on docker compose, (no persistence yet)

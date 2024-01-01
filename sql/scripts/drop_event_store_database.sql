@@ -1,1 +1,0 @@
-DROP DATABASE ${APPLICATION}_event_store;

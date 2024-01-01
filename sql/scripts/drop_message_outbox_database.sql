@@ -1,1 +1,0 @@
-DROP DATABASE ${APPLICATION}_message_outbox;

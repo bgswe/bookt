@@ -18,7 +18,6 @@ RUN ls -la ~/.ssh
 
 COPY ./requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+COPY . ./api
 
-COPY . ./message_handler
-
-CMD ["python", "-m", "message_handler.main"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

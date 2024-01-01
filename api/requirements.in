@@ -3,7 +3,8 @@ uvicorn[standard]
 confluent-kafka
 bcrypt
 PyJWT
-cosmos @ git+https://github.com/bgswe/cosmos
-dependency-injector
+dependency-injector  # TODO: do I need this for API?
 pydantic[email]
 python-multipart
+cosmos @ git+ssh://git@github.com-cosmos/bgswe/cosmos
+bookt_domain @ git+ssh://git@github.com-bookt-domain/bgswe/bookt-domain

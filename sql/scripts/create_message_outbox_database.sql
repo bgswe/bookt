@@ -1,1 +1,0 @@
-CREATE DATABASE ${APPLICATION}_message_outbox;

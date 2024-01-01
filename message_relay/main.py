@@ -6,19 +6,19 @@ import structlog
 from confluent_kafka import Producer
 
 from message_relay.settings import (
-    EVENT_STORE_DATABASE_HOST,
-    EVENT_STORE_DATABASE_NAME,
-    EVENT_STORE_DATABASE_PASSWORD,
-    EVENT_STORE_DATABASE_USER,
+    DATABASE_HOST,
+    DATABASE_NAME,
+    DATABASE_PASSWORD,
+    DATABASE_USER,
     KAFKA_HOST,
 )
 
 logger = structlog.get_logger()
 
 
-log = logger.bind(MESSAGE_OUTBOX_DATABASE_HOST=EVENT_STORE_DATABASE_HOST)
-log = log.bind(MESSAGE_OUTBOX_DATABASE_NAME=EVENT_STORE_DATABASE_NAME)
-log = log.bind(MESSAGE_OUTBOX_DATABASE_USER=EVENT_STORE_DATABASE_USER)
+log = logger.bind(DATABASE_HOST=DATABASE_HOST)
+log = log.bind(DATABASE_NAME=DATABASE_NAME)
+log = log.bind(DATABASE_USER=DATABASE_USER)
 log = log.bind(KAFKA_HOST=KAFKA_HOST)
 
 log.info("starting message-relay application")
@@ -40,10 +40,10 @@ def main():
             log.error("failed to deliver message")
         else:
             conn = psycopg2.connect(
-                host=EVENT_STORE_DATABASE_HOST,
-                dbname=EVENT_STORE_DATABASE_NAME,
-                user=EVENT_STORE_DATABASE_USER,
-                password=EVENT_STORE_DATABASE_PASSWORD,
+                host=DATABASE_HOST,
+                dbname=DATABASE_NAME,
+                user=DATABASE_USER,
+                password=DATABASE_PASSWORD,
             )
 
             with conn:
@@ -61,10 +61,10 @@ def main():
 
     while True:
         conn = psycopg2.connect(
-            host=EVENT_STORE_DATABASE_HOST,
-            dbname=EVENT_STORE_DATABASE_NAME,
-            user=EVENT_STORE_DATABASE_USER,
-            password=EVENT_STORE_DATABASE_PASSWORD,
+            host=DATABASE_HOST,
+            dbname=DATABASE_NAME,
+            user=DATABASE_USER,
+            password=DATABASE_PASSWORD,
         )
 
         with conn:

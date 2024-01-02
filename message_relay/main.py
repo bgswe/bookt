@@ -1,3 +1,4 @@
+import logging
 import socket
 from time import sleep
 
@@ -13,8 +14,11 @@ from message_relay.settings import (
     KAFKA_HOST,
 )
 
-logger = structlog.get_logger()
+structlog.configure(
+    wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
+)
 
+logger = structlog.get_logger()
 
 log = logger.bind(DATABASE_HOST=DATABASE_HOST)
 log = log.bind(DATABASE_NAME=DATABASE_NAME)
@@ -33,6 +37,8 @@ def main():
     pending_messages = set()
 
     def acked(err, msg):
+        log.info("kafka acked invoked")
+
         key = str(msg.key(), encoding="utf-8")
 
         if err is not None:
@@ -60,8 +66,7 @@ def main():
                     pending_messages.remove(key)
 
     while True:
-        log = logger.bind(pending_messages=str(pending_messages))
-        log.info("top of MR loop")
+        log.info("Message Relay Loop")
 
         conn = psycopg2.connect(
             host=DATABASE_HOST,
@@ -72,19 +77,22 @@ def main():
 
         with conn:
             with conn.cursor() as cursor:
-                cursor.execute(
-                    f"""
+                outbox_query = f"""
                     SELECT
                         *
                     FROM
                         message_outbox
-                    WHERE
-                        id not in ({",".join(pending_messages)})
                 """
-                )
 
+                if len(pending_messages) > 0:
+                    outbox_query = (
+                        f"{outbox_query} WHERE id not in ({','.join(pending_messages)})"
+                    )
+
+                logger.debug(outbox_query)
+
+                cursor.execute(outbox_query)
                 columns = {desc[0]: i for i, desc in enumerate(cursor.description)}
-
                 messages = cursor.fetchall()
 
                 if messages:
@@ -104,7 +112,7 @@ def main():
 
                     producer.poll(0.1)
                 else:
-                    logger.info("there are no messages to push")
+                    logger.debug("there are no messages to push")
 
                 sleep(0.1)
 

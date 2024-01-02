@@ -1,5 +1,6 @@
 import asyncio
-from time import sleep
+import logging
+import pickle
 
 import structlog
 from bookt_domain.model import Account, AccountCreated
@@ -15,6 +16,10 @@ from message_handler.settings import (
     DATABASE_PASSWORD,
     DATABASE_USER,
     KAFKA_HOST,
+)
+
+structlog.configure(
+    wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
 )
 
 logger = structlog.get_logger()
@@ -35,9 +40,6 @@ conf = {
 
 
 async def main():
-    # TODO: Listen for messages from MessageQueue and feed
-    # them into the service layer command, and event handlers
-
     try:
         log = logger.bind(conf=conf)
         log.info("kafka consumer conf")
@@ -51,17 +53,16 @@ async def main():
         logger.info("subscribed to messages topic")
 
         while True:
-            message = consumer.poll(timeout=1.0)
+            logger.info("Message Handler Loop")
+
+            message = consumer.poll(timeout=0.1)
             if message is None:
-                log.info("no messages")
-                sleep(0.1)
+                log.debug("no messages")
                 continue
 
             if error := message.error():
                 logger.error(error)
             else:
-                import pickle
-
                 message = pickle.loads(message.value())
 
                 log.info(message)

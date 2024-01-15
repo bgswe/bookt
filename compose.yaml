@@ -20,7 +20,21 @@ services:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_IN://kafka:29092,LISTENER_OUT://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_IN:PLAINTEXT,LISTENER_OUT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_IN
-      # KAFKA_CREATE_TOPICS: "messages:1:1"
+
+  postgresql:
+    image: postgres
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: $DATABASE_NAME
+      POSTGRES_USER: $DATABASE_USER
+      POSTGRES_PASSWORD: $DATABASE_PASSWORD
+      POSTGRES_ROOT_PASSWORD: $DATABASE_ROOT_PASSWORD
+    ports:
+      - 5432:5432
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   api:
     build: ./api

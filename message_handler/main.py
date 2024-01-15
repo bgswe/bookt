@@ -42,31 +42,30 @@ conf = {
 async def main():
     try:
         log = logger.bind(conf=conf)
-        log.info("kafka consumer conf")
+        log.debug("kafka consumer conf")
 
         consumer = Consumer(conf)
 
         log = logger.bind(consumer=consumer)
-        log.info("kafka consumer connected")
+        log.debug("kafka consumer connected")
 
         consumer.subscribe(["messages"])
-        logger.info("subscribed to messages topic")
 
         while True:
-            logger.info("Message Handler Loop")
+            logger.info("--- MESSAGE HANDLER ITERATION ---")
 
-            message = consumer.poll(timeout=0.1)
+            message = consumer.poll(timeout=1)
             if message is None:
                 log.debug("no messages")
                 continue
 
             if error := message.error():
                 logger.error(error)
+                continue
             else:
                 message = pickle.loads(message.value())
 
                 log.info(message)
-
                 if isinstance(message, Event):
                     await handle_event(event=message)
 

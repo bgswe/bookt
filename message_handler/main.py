@@ -21,16 +21,7 @@ from message_handler.settings import (
 structlog.configure(
     wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
 )
-
 logger = structlog.get_logger()
-
-log = logger.bind(DATABASE_HOST=DATABASE_HOST)
-log = log.bind(DATABASE_NAME=DATABASE_NAME)
-log = log.bind(DATABASE_USER=DATABASE_USER)
-log = log.bind(KAFKA_HOST=KAFKA_HOST)
-
-log.info("starting message-handler application")
-
 
 conf = {
     "bootstrap.servers": KAFKA_HOST,
@@ -85,6 +76,7 @@ if __name__ == "__main__":
             "database_host": DATABASE_HOST,
             "database_name": DATABASE_NAME,
             "database_user": DATABASE_USER,
+            "database_password": DATABASE_PASSWORD,
         }
     )
     container.config.event_hydration_mapping.from_dict(

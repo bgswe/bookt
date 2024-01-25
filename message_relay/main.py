@@ -29,11 +29,13 @@ def get_connection_pool():
                 port=settings.database_port,
             )
         except Exception as e:
-            log = logger.bind(exception=e)
+            log = logger.bind(exception=str(e))
             log.warning("unable to create connection pool")
 
             sleep(1)
             continue
+
+    return connection_pool
 
 
 def acknowledge_callback(connection_pool, pending_messages):

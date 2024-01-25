@@ -1,5 +1,6 @@
 pre-commit
 structlog
+pydantic-settings
 
 psycopg2-binary
 confluent-kafka

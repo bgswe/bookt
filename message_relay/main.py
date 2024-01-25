@@ -7,13 +7,7 @@ import structlog
 from confluent_kafka import Producer
 from psycopg2 import pool
 
-from message_relay.settings import (
-    DATABASE_HOST,
-    DATABASE_NAME,
-    DATABASE_PASSWORD,
-    DATABASE_USER,
-    KAFKA_HOST,
-)
+from message_relay.settings import settings
 
 structlog.configure(
     wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
@@ -23,7 +17,7 @@ logger = structlog.get_logger()
 
 def main():
     conf = {
-        "bootstrap.servers": KAFKA_HOST,
+        "bootstrap.servers": settings.kafka_host,
         "client.id": socket.gethostname(),
     }
 
@@ -38,14 +32,15 @@ def main():
                 connection_pool = pool.SimpleConnectionPool(
                     minconn=1,
                     maxconn=20,
-                    user=DATABASE_USER,
-                    password=DATABASE_PASSWORD,
-                    host=DATABASE_HOST,
-                    database=DATABASE_NAME,
-                    port=5432,
+                    user=settings.database_user,
+                    password=settings.database_password,
+                    host=settings.database_host,
+                    database=settings.database_name,
+                    port=settings.database_port,
                 )
             except Exception as e:
                 logger.error("cannot create connection pool")
+                logger.error(e)
                 sleep(1)
                 continue
 
@@ -55,6 +50,8 @@ def main():
             logger.info("--- MESSAGE RELAY ITERATION ---")
 
             def acked(err, msg):
+                logger.info("--- ACKED ---")
+
                 if err is not None:
                     log = log.bind(message=str(msg), error=str(err))
                     log.error("failed to deliver message")
@@ -62,7 +59,6 @@ def main():
                     key = str(msg.key(), encoding="utf-8")
 
                     connection = connection_pool.getconn()
-
                     if connection:
                         cursor = connection.cursor()
                         cursor.execute(
@@ -73,8 +69,10 @@ def main():
                                 id = '{key}'
                         """,
                         )
+                        connection.commit()
                         cursor.close()
                         connection_pool.putconn(connection)
+
                     else:
                         logger.error("failed to acquire pg connection")
 
@@ -106,6 +104,8 @@ def main():
                     producer = Producer(conf)
 
                     for m in messages:
+                        producer.poll(0)
+
                         message_id = m[columns["id"]]
                         producer.produce(
                             "messages",
@@ -113,10 +113,12 @@ def main():
                             value=bytes(m[columns["message"]]),
                             callback=acked,
                         )
-
                         pending_messages.add(message_id)
 
-                    producer.poll(1)
+                        logger.info(m)
+
+                    producer.flush()
+
                 else:
                     logger.debug("there are no messages to push")
 

@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import pickle
+from time import sleep
 
 import structlog
 from bookt_domain.model import Account, AccountCreated
@@ -62,6 +63,8 @@ async def main():
 
                 elif isinstance(message, Command):
                     await handle_command(command=message)
+
+                sleep(1)
 
     finally:
         # Close down consumer to commit final offsets.

@@ -14,6 +14,63 @@ structlog.configure(
 logger = structlog.get_logger()
 
 
+def get_connection_pool():
+    connection_pool = None
+
+    while connection_pool is None:
+        try:
+            connection_pool = pool.SimpleConnectionPool(
+                minconn=settings.database_min_connections,
+                maxconn=settings.database_max_connections,
+                user=settings.database_user,
+                password=settings.database_password,
+                host=settings.database_host,
+                database=settings.database_name,
+                port=settings.database_port,
+            )
+        except Exception as e:
+            log = logger.bind(exception=e)
+            log.warning("unable to create connection pool")
+
+            sleep(1)
+            continue
+
+
+def acknowledge_callback(connection_pool, pending_messages):
+    def ack(err, msg):
+        log = logger.bind(err=err, msg=msg)
+        log.debug("ack invoked")
+
+        if err is not None:
+            logger.error("failed to deliver message")
+        else:
+            key = str(msg.key(), encoding="utf-8")
+            log = logger.bind(key=key)
+            log.debug("ack message received")
+
+            connection = connection_pool.getconn()
+            if connection:
+                cursor = connection.cursor()
+                cursor.execute(
+                    f"""
+                    DELETE FROM
+                        message_outbox
+                    WHERE
+                        id = '{key}'
+                """,
+                )
+                cursor.close()
+                connection.commit()
+                connection_pool.putconn(connection)
+
+            else:
+                logger.error("failed to acquire pg connection")
+
+            pending_messages.remove(key)
+
+    return ack
+
+
 def main():
     conf = {
         "bootstrap.servers": settings.kafka_host,
@@ -24,66 +81,16 @@ def main():
     connection_pool = None
 
     try:
-        connection_pool = None
-
-        while connection_pool is None:
-            try:
-                connection_pool = pool.SimpleConnectionPool(
-                    minconn=settings.database_min_connections,
-                    maxconn=settings.database_max_connections,
-                    user=settings.database_user,
-                    password=settings.database_password,
-                    host=settings.database_host,
-                    database=settings.database_name,
-                    port=settings.database_port,
-                )
-            except Exception as e:
-                logger.error("cannot create connection pool")
-                logger.error(e)
-                sleep(1)
-                continue
-
-        logger.debug("connection pool created")
+        connection_pool = get_connection_pool()
 
         while True:
-            logger.info("--- MESSAGE RELAY ITERATION ---")
-
-            def acked(err, msg):
-                logger.info("--- ACKED ---")
-
-                if err is not None:
-                    log = log.bind(message=str(msg), error=str(err))
-                    log.error("failed to deliver message")
-                else:
-                    key = str(msg.key(), encoding="utf-8")
-
-                    connection = connection_pool.getconn()
-                    if connection:
-                        cursor = connection.cursor()
-                        cursor.execute(
-                            f"""
-                            DELETE FROM
-                                message_outbox
-                            WHERE
-                                id = '{key}'
-                        """,
-                        )
-                        connection.commit()
-                        cursor.close()
-                        connection_pool.putconn(connection)
-
-                    else:
-                        logger.error("failed to acquire pg connection")
-
-                    pending_messages.remove(key)
-
             connection = connection_pool.getconn()
             if connection:
                 outbox_query = f"""
                     SELECT
                         *
                     FROM
-                        message_outbox
+                        message_outbox;
                 """
 
                 # prevent querying for messages that are being processed
@@ -110,11 +117,12 @@ def main():
                             "messages",
                             key=message_id,
                             value=bytes(m[columns["message"]]),
-                            callback=acked,
+                            callback=acknowledge_callback(
+                                connection_pool=connection_pool,
+                                pending_messages=pending_messages,
+                            ),
                         )
                         pending_messages.add(message_id)
-
-                        logger.info(m)
 
                     producer.flush()
 

@@ -1,6 +1,5 @@
 import logging
 import socket
-import sys
 from time import sleep
 
 import structlog
@@ -30,8 +29,8 @@ def main():
         while connection_pool is None:
             try:
                 connection_pool = pool.SimpleConnectionPool(
-                    minconn=1,
-                    maxconn=20,
+                    minconn=settings.database_min_connections,
+                    maxconn=settings.database_max_connections,
                     user=settings.database_user,
                     password=settings.database_password,
                     host=settings.database_host,
@@ -124,9 +123,10 @@ def main():
 
                 cursor.close()
                 connection_pool.putconn(connection)
-                sleep(1)
             else:
                 logger.error("failed to acquire pg connection")
+
+            sleep(settings.iteration_sleep_duration)
 
     finally:
         if connection_pool:

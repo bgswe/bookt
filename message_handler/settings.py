@@ -1,8 +1,22 @@
-import os
+import structlog
+from pydantic_settings import BaseSettings
 
-DATABASE_HOST = os.getenv("DATABASE_HOST")
-DATABASE_NAME = os.getenv("DATABASE_NAME")
-DATABASE_USER = os.getenv("DATABASE_USER")
-DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+logger = structlog.get_logger()
 
-KAFKA_HOST = os.getenv("KAFKA_HOST")
+
+class Settings(BaseSettings):
+    iteration_sleep_duration: float = 1.0
+
+    database_host: str = "localhost"
+    database_name: str = "bookt"
+    database_user: str = "postgres"
+    database_password: str = "postgres"
+    database_port: int = 5432
+
+    kafka_host: str = "localhost:9092"
+    kafka_group_id: str = "message-handler"
+
+
+settings = Settings()
+
+logger.debug(settings)

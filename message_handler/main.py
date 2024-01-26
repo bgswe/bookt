@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import pickle
-from time import sleep
 
 import structlog
 from bookt_domain.model import Account, AccountCreated
@@ -11,13 +10,7 @@ from confluent_kafka import Consumer
 from cosmos.contrib.pg.containers import PostgresDomainContainer
 from cosmos.domain import Command, Event
 
-from message_handler.settings import (
-    DATABASE_HOST,
-    DATABASE_NAME,
-    DATABASE_PASSWORD,
-    DATABASE_USER,
-    KAFKA_HOST,
-)
+from message_handler.settings import settings
 
 structlog.configure(
     wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
@@ -25,30 +18,20 @@ structlog.configure(
 logger = structlog.get_logger()
 
 conf = {
-    "bootstrap.servers": KAFKA_HOST,
-    "group.id": "message-handler",
+    "bootstrap.servers": settings.kafka_host,
+    "group.id": settings.kafka_group_id,
     "auto.offset.reset": "earliest",
 }
 
 
 async def main():
     try:
-        log = logger.bind(conf=conf)
-        log.debug("kafka consumer conf")
-
         consumer = Consumer(conf)
-
-        log = logger.bind(consumer=consumer)
-        log.debug("kafka consumer connected")
-
         consumer.subscribe(["messages"])
 
         while True:
-            logger.info("--- MESSAGE HANDLER ITERATION ---")
-
-            message = consumer.poll(timeout=1)
+            message = consumer.poll(timeout=1.0)
             if message is None:
-                log.debug("no messages")
                 continue
 
             if error := message.error():
@@ -57,14 +40,11 @@ async def main():
             else:
                 message = pickle.loads(message.value())
 
-                log.info(message)
                 if isinstance(message, Event):
                     await handle_event(event=message)
 
                 elif isinstance(message, Command):
                     await handle_command(command=message)
-
-                sleep(1)
 
     finally:
         # Close down consumer to commit final offsets.
@@ -76,10 +56,10 @@ if __name__ == "__main__":
 
     container.config.from_dict(
         {
-            "database_host": DATABASE_HOST,
-            "database_name": DATABASE_NAME,
-            "database_user": DATABASE_USER,
-            "database_password": DATABASE_PASSWORD,
+            "database_host": settings.database_host,
+            "database_name": settings.database_name,
+            "database_user": settings.database_user,
+            "database_password": settings.database_password,
         }
     )
     container.config.event_hydration_mapping.from_dict(

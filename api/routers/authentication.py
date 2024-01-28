@@ -4,7 +4,6 @@ from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 
 from api.dependencies import jwt_bearer
-from api.settings import APPLICATION_NAME
 
 router = APIRouter(
     prefix="/auth",
@@ -26,7 +25,7 @@ async def login(
             SELECT
                 *
             FROM
-                {APPLICATION_NAME}_user
+                user
             WHERE
                 email = $1;
             """,

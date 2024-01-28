@@ -9,6 +9,7 @@ bcrypt
 PyJWT
 
 dependency-injector
+pydantic-settings
 pydantic[email]
 asyncpg
 confluent-kafka

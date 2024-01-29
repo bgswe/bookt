@@ -1,5 +1,4 @@
-## Current project Notes
+## Project Notes
 
-- requries local instance of postgres for now
-- runs on docker compose, (no persistence yet)
+- runs on docker compose
 - message_handler, and api services both depend on ssh keys to use private repos

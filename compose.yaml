@@ -12,6 +12,16 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  mongodb:
+    image: mongo:6-jammy
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
@@ -76,3 +86,4 @@ services:
 
 volumes:
   pgdata:
+  mongodb:

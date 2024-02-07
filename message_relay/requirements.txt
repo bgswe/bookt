@@ -6,22 +6,14 @@
 #
 annotated-types==0.6.0
     # via pydantic
-cfgv==3.4.0
-    # via pre-commit
 confluent-kafka==2.3.0
     # via -r requirements.in
-distlib==0.3.8
-    # via virtualenv
-filelock==3.13.1
-    # via virtualenv
-identify==2.5.33
-    # via pre-commit
-nodeenv==1.8.0
-    # via pre-commit
-platformdirs==4.1.0
-    # via virtualenv
-pre-commit==3.6.0
-    # via -r requirements.in
+iniconfig==2.0.0
+    # via pytest
+packaging==23.2
+    # via pytest
+pluggy==1.4.0
+    # via pytest
 psycopg2-binary==2.9.9
     # via -r requirements.in
 pydantic==2.5.3
@@ -30,18 +22,13 @@ pydantic-core==2.14.6
     # via pydantic
 pydantic-settings==2.1.0
     # via -r requirements.in
+pytest==8.0.0
+    # via -r requirements.in
 python-dotenv==1.0.1
     # via pydantic-settings
-pyyaml==6.0.1
-    # via pre-commit
 structlog==24.1.0
     # via -r requirements.in
 typing-extensions==4.9.0
     # via
     #   pydantic
     #   pydantic-core
-virtualenv==20.25.0
-    # via pre-commit
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools

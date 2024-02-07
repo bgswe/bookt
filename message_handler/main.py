@@ -3,7 +3,7 @@ import logging
 import pickle
 
 import structlog
-from bookt_domain.model import Account, AccountCreated
+from bookt_domain.model import Account
 from bookt_domain.service.command_handlers import handle_command
 from bookt_domain.service.event_handlers import handle_event
 from confluent_kafka import Consumer
@@ -59,14 +59,11 @@ if __name__ == "__main__":
             "database_host": settings.database_host,
             "database_name": settings.database_name,
             "database_user": settings.database_user,
+            "database_port": settings.database_port,
             "database_password": settings.database_password,
         }
     )
-    container.config.event_hydration_mapping.from_dict(
-        {
-            "AccountCreated": AccountCreated,
-        }
-    )
+
     container.config.aggregate_root_mapping.from_dict(
         {
             "Account": Account,

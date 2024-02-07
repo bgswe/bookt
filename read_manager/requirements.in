@@ -2,5 +2,5 @@ structlog
 pydantic-settings
 pytest
 
-psycopg2-binary
+asyncpg
 confluent-kafka

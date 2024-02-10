@@ -4,3 +4,4 @@ pytest
 
 asyncpg
 confluent-kafka
+cosmos @ git+https://github.com/bgswe/cosmos

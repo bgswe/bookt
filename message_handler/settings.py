@@ -5,8 +5,6 @@ logger = structlog.get_logger()
 
 
 class Settings(BaseSettings):
-    iteration_sleep_duration: float = 1.0
-
     database_host: str = "localhost"
     database_name: str = "event_store"
     database_user: str = "postgres"

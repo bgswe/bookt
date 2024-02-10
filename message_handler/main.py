@@ -47,7 +47,7 @@ async def main():
                     await handle_command(command=message)
 
     finally:
-        # Close down consumer to commit final offsets.
+        # Close down consumer to commit final offsets
         consumer.close()
 
 

@@ -6,7 +6,7 @@ import structlog
 from confluent_kafka import Consumer
 from cosmos.domain import Event
 
-from read_manager import settings
+from read_manager.settings import settings
 
 structlog.configure(
     wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
@@ -46,4 +46,4 @@ async def main(consumer):
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main(consumer=consumer))

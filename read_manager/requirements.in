@@ -4,4 +4,6 @@ pytest
 
 asyncpg
 confluent-kafka
+dependency-injector
 cosmos @ git+https://github.com/bgswe/cosmos
+bookt_domain @ git+https://github.com/bgswe/bookt-domain

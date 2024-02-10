@@ -73,6 +73,12 @@ services:
       - DATABASE_USER=$EVENT_DATABASE_USER
       - DATABASE_PASSWORD=$EVENT_DATABASE_PASSWORD
 
+  read_manager:
+    build:
+      context: ./read_manager
+    environment:
+      - KAFKA_HOST=$KAFKA_HOST
+
 volumes:
   pg_event_data:
   pg_query_data:

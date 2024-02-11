@@ -1,7 +1,8 @@
 structlog
 pydantic-settings
+pydantic[email]
 pytest
-
+bcrypt
 asyncpg
 confluent-kafka
 dependency-injector

@@ -43,7 +43,7 @@ async def insert_new_user(
 ):
     await connection.execute(
         """
-        INSERT INTO usr(id, email, first_name, last_name, account_id, password)
+        INSERT INTO usr(id, email, first_name, last_name, account_id, hash)
         VALUES($1, $2, $3, $4, $5, $6)
     """,
         str(event.stream_id),
@@ -51,7 +51,7 @@ async def insert_new_user(
         event.first_name,
         event.last_name,
         str(event.account_id),
-        "password",
+        "$2b$12$60a1iSYRlr5HO2gu4Ed76OYQ.zTw1ZT.1Bf1KrH6WB1IqeP06PERO",
     )
 
 

@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 
+from api import authentication
 from api.dependencies import jwt_bearer
 
 router = APIRouter(
@@ -19,13 +20,13 @@ async def login(
 ):
     """OAuth2 compliant user login"""
 
-    async with request.app.pool.acquire() as connection:
+    async with request.app.state.pool.acquire() as connection:
         user = await connection.fetchrow(
             f"""
             SELECT
-                *
+                id, hash
             FROM
-                user
+                usr
             WHERE
                 email = $1;
             """,
@@ -40,16 +41,16 @@ async def login(
         if user is None:
             raise failed_auth_exception
 
-        if not is_password_correct(
+        if not authentication.is_password_correct(
             password=form_data.password,
-            hash=user["password"],
+            hash=user["hash"],
         ):
             raise failed_auth_exception
 
-        client_id = str(user["id"])
+        client_id = user["id"]
 
-        access_token = get_access_token(client_id=client_id)
-        refresh_token = get_refresh_token(client_id=client_id)
+        access_token = authentication.get_access_token(client_id=client_id)
+        refresh_token = authentication.get_refresh_token(client_id=client_id)
 
         # set refresh token as httpOnly cookie, used on backend when access expires
         response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
@@ -62,8 +63,8 @@ async def refresh(refresh_token: Annotated[str, Cookie()]):
     """Provides authenticated clients w/ new access token"""
 
     try:
-        payload = decode_refresh_token(token=refresh_token)
-        access_token = get_access_token(client_id=payload["client_id"])
+        payload = authentication.decode_refresh_token(token=refresh_token)
+        access_token = authentication.get_access_token(client_id=payload["client_id"])
 
         # TODO: should this command also refresh the refresh token?
         # a configurable policy related to refresh token settings
@@ -71,7 +72,7 @@ async def refresh(refresh_token: Annotated[str, Cookie()]):
 
         return {"access_token": access_token}
 
-    except (ExpiredToken, InvalidToken):
+    except (authentication.ExpiredToken, authentication.InvalidToken):
         # unsure if both exceptions should be handled together
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

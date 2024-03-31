@@ -9,7 +9,7 @@ CREATE TABLE usr
 (
     id          VARCHAR(36) PRIMARY KEY,
     email       TEXT NOT NULL,
-    password    TEXT,
+    hash        TEXT,
     last_login  TIMESTAMP,
     first_name  TEXT,
     last_name   TEXT,

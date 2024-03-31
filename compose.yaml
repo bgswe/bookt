@@ -61,6 +61,8 @@ services:
       - DATABASE_NAME=$EVENT_DATABASE_NAME
       - DATABASE_USER=$EVENT_DATABASE_USER
       - DATABASE_PASSWORD=$EVENT_DATABASE_PASSWORD
+    depends_on:
+      - postgres_event
 
   message_handler:
     build:
@@ -72,12 +74,21 @@ services:
       - DATABASE_NAME=$EVENT_DATABASE_NAME
       - DATABASE_USER=$EVENT_DATABASE_USER
       - DATABASE_PASSWORD=$EVENT_DATABASE_PASSWORD
+    depends_on:
+      - postgres_event
 
   read_manager:
     build:
       context: ./read_manager
     environment:
       - KAFKA_HOST=$KAFKA_HOST
+      - DATABASE_HOST=$QUERY_DATABASE_HOST
+      - DATABASE_PORT=$QUERY_DATABASE_PORT
+      - DATABASE_NAME=$QUERY_DATABASE_NAME
+      - DATABASE_USER=$QUERY_DATABASE_USER
+      - DATABASE_PASSWORD=$QUERY_DATABASE_PASSWORD
+    depends_on:
+      - postgres_query
 
 volumes:
   pg_event_data:

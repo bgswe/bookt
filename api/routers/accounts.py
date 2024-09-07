@@ -1,6 +1,6 @@
 import pickle
 
-from bookt_domain.service.commands import Register
+from bookt_domain.model.commands import Register
 from fastapi import APIRouter, Depends
 
 from api.dependencies import jwt_bearer

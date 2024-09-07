@@ -12,23 +12,24 @@ loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    pool = await asyncpg.create_pool(
-        host=settings.database_host,
-        database=settings.database_name,
-        user=settings.database_user,
-        port=settings.database_port,
-        password=settings.database_password,
-    )
-    app.state.pool = pool
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     pool = await asyncpg.create_pool(
+#         host=settings.database_host,
+#         database=settings.database_name,
+#         user=settings.database_user,
+#         port=settings.database_port,
+#         password=settings.database_password,
+#     )
+#     app.state.pool = pool
 
-    yield
+#     yield
 
-    pool.close()
+#     pool.close()
 
 
-app = FastAPI(lifespan=lifespan)
+# app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 
 app.add_middleware(
@@ -39,7 +40,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(authentication.router)
-
+# app.include_router(authentication.router)
 # app.include_router(accounts.query_router)
+
 app.include_router(accounts.command_router)
+
+
+@app.get("/health")
+def health():
+    print("health endpoint")

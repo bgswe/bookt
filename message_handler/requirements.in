@@ -14,4 +14,4 @@ pydantic[email]
 asyncpg
 confluent-kafka
 cosmos @ git+https://github.com/bgswe/cosmos
-# bookt_domain @ git+https://github.com/bgswe/bookt-domain
+bookt_domain @ git+https://github.com/bgswe/bookt-domain

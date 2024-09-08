@@ -32,7 +32,7 @@ services:
       - POSTGRES_USER=$EVENT_STORE_USER
       - POSTGRES_PASSWORD=$EVENT_STORE_PASSWORD
     volumes:
-      # - pg_event_data:/var/lib/postgresql/data
+      - pg_event_data:/var/lib/postgresql/data
       - ./database/init_event_store.sql:/docker-entrypoint-initdb.d/init.sql
 
   api:
@@ -41,6 +41,15 @@ services:
       - 8080:8080
     environment:
       KAFKA_HOST: kafka:9092
+    depends_on:
+      - postgres
+      - kafka
+    command:
+      [
+        "bash",
+        "-c",
+        "while !</dev/tcp/postgres/5432; do sleep 1; done; while !</dev/tcp/kafka/9092; do sleep 1; done; uvicorn api.main:app --host 0.0.0.0 --port 8080",
+      ]
 
   message_handler:
     build:
@@ -52,3 +61,14 @@ services:
       - EVENT_STORE_USER=$EVENT_STORE_USER
       - EVENT_STORE_PASSWORD=$EVENT_STORE_PASSWORD
       - EVENT_STORE_PORT=5432
+    depends_on:
+      - postgres
+      - kafka
+    command:
+      [
+        "bash",
+        "-c",
+        "while !</dev/tcp/postgres/5432; do sleep 1; done; while !</dev/tcp/kafka/9092; do sleep 1; done; python -m message_handler.main",
+      ]
+volumes:
+  pg_event_data:

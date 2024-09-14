@@ -113,7 +113,7 @@ class MessageManager:
 
         if handlers:
             for handler in handlers:
-                await handler(uow=unit_of_work, event=event)
+                await handler(unit_of_work=unit_of_work, event=event)
 
     async def _handle_command(
         self: "MessageManager",

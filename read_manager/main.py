@@ -4,7 +4,8 @@ import pickle
 
 import asyncpg
 import structlog
-from bookt_domain.model import AccountCreated, UserCreated
+from bookt_domain.model.tenant import TenantRegistered
+from bookt_domain.model.user import UserCreated
 from confluent_kafka import Consumer
 from cosmos.domain import Event
 
@@ -25,15 +26,15 @@ consumer = Consumer(conf)
 
 
 async def insert_new_account(
-    event: AccountCreated,
+    event: TenantRegistered,
     connection: asyncpg.Connection,
 ):
     await connection.execute(
         """
-        INSERT INTO account(id, originator_email) VALUES($1, $2)
+        INSERT INTO tenant(id, name) VALUES($1, $2)
     """,
         str(event.stream_id),
-        event.originator_email,
+        event.tenant_name,
     )
 
 
@@ -43,20 +44,20 @@ async def insert_new_user(
 ):
     await connection.execute(
         """
-        INSERT INTO usr(id, email, first_name, last_name, account_id, hash)
+        INSERT INTO usr(id, email, first_name, last_name, tenant_id, hash)
         VALUES($1, $2, $3, $4, $5, $6)
     """,
         str(event.stream_id),
         event.email,
         event.first_name,
         event.last_name,
-        str(event.account_id),
+        str(event.tenant_id),
         "$2b$12$60a1iSYRlr5HO2gu4Ed76OYQ.zTw1ZT.1Bf1KrH6WB1IqeP06PERO",
     )
 
 
 EVENT_HANDLERS = {
-    "AccountCreated": [insert_new_account],
+    "TenantRegistered": [insert_new_account],
     "UserCreated": [insert_new_user],
 }
 

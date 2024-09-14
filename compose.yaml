@@ -70,5 +70,25 @@ services:
         "-c",
         "while !</dev/tcp/postgres/5432; do sleep 1; done; while !</dev/tcp/kafka/9092; do sleep 1; done; python -m message_handler.main",
       ]
+
+  message_relay:
+    build: ./message_relay
+    environment:
+      - KAFKA_HOST=$KAFKA_HOST
+      - DATABASE_HOST=$EVENT_STORE_HOST
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=$EVENT_STORE_NAME
+      - DATABASE_USER=$EVENT_STORE_USER
+      - DATABASE_PASSWORD=$EVENT_STORE_PASSWORD
+    depends_on:
+      - postgres
+      - kafka
+    command:
+      [
+        "bash",
+        "-c",
+        "while !</dev/tcp/postgres/5432; do sleep 1; done; while !</dev/tcp/kafka/9092; do sleep 1; done; python -m message_relay.main",
+      ]
+
 volumes:
   pg_event_data:

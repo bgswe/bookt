@@ -1,8 +1,8 @@
 -- create processed message table
-CREATE TABLE account
+CREATE TABLE tenant
 (
-    id               VARCHAR(36) PRIMARY KEY,
-    originator_email TEXT NOT NULL
+    id VARCHAR(36) PRIMARY KEY,
+    name TEXT NOT NULL,
 );
 
 CREATE TABLE usr
@@ -14,5 +14,5 @@ CREATE TABLE usr
     first_name  TEXT,
     last_name   TEXT,
 
-    account_id  VARCHAR(36) NOT NULL
+    tenant_id  VARCHAR(36) NOT NULL
 );

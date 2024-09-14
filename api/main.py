@@ -5,8 +5,11 @@ import asyncpg
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routers import accounts, authentication
-from api.settings import settings
+# from api.routers import authentication
+from api.routers.commands import command_router
+from api.routers.queries import query_router
+
+# from api.settings import settings
 
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
@@ -41,9 +44,9 @@ app.add_middleware(
 )
 
 # app.include_router(authentication.router)
-# app.include_router(accounts.query_router)
 
-app.include_router(accounts.command_router)
+app.include_router(command_router)
+app.include_router(query_router)
 
 
 @app.get("/health")

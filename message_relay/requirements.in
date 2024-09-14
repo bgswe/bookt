@@ -1,6 +1,7 @@
+pytest
+
 structlog
 pydantic-settings
-pytest
 
 psycopg2-binary
 confluent-kafka

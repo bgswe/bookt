@@ -109,7 +109,7 @@ class MessageManager:
         unit_of_work: UnitOfWork,
         event: Event,
     ) -> None:
-        handlers = self._event_handlers.get(event.name)
+        handlers = self._event_handlers.get(event.type_name)
 
         if handlers:
             for handler in handlers:
@@ -120,7 +120,7 @@ class MessageManager:
         unit_of_work: UnitOfWork,
         command: Command,
     ) -> None:
-        handler = self._command_handlers.get(command.name)
+        handler = self._command_handlers.get(command.type_name)
 
         if handler:
             await handler(unit_of_work=unit_of_work, command=command)

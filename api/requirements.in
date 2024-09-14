@@ -1,14 +1,13 @@
-fastapi
-uvicorn[standard]
-confluent-kafka
-bcrypt
-PyJWT
-pyjwt[crypto]
-dependency-injector  # TODO: do I need this for API?
-pydantic[email]
-python-multipart
 cosmos @ git+https://github.com/bgswe/cosmos
 bookt_domain @ git+https://github.com/bgswe/bookt-domain
-asyncpg
-structlog
+
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic[email]
+
 pydantic_settings
+structlog
+
+# asyncpg
+confluent-kafka

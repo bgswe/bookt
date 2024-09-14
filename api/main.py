@@ -1,7 +1,7 @@
 import asyncio
 from contextlib import asynccontextmanager
 
-import asyncpg
+# import asyncpg
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

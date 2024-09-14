@@ -1,17 +1,11 @@
-pre-commit
-structlog
+cosmos @ git+https://github.com/bgswe/cosmos
+bookt_domain @ git+https://github.com/bgswe/bookt-domain
 
 pytest
 pytest-asyncio
-httpx
 
-# bcrypt
-# PyJWT
-
-# dependency-injector
 pydantic-settings
-pydantic[email]
+structlog
+
 asyncpg
 confluent-kafka
-cosmos @ git+https://github.com/bgswe/cosmos
-bookt_domain @ git+https://github.com/bgswe/bookt-domain

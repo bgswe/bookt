@@ -1,6 +1,10 @@
 import pickle
 
-from bookt_domain.model.commands import RegisterTenant
+from bookt_domain.model.commands import (
+    RegisterTenant,
+    RegisterUser,
+    ValidateTenantEmail,
+)
 from cosmos.domain import Command
 
 # from fastapi import APIRouter, Depends
@@ -12,7 +16,7 @@ from api.producer import producer
 # TODO: Utilize jwt_bearer auth
 # command_router = APIRouter(prefix="/command", dependencies=[Depends(jwt_bearer)])
 
-command_router = APIRouter(prefix="/command")
+command_router = APIRouter(prefix="/command", tags=["Commands"])
 
 
 def delivery_report(err, msg):
@@ -38,6 +42,18 @@ def send_command_to_message_bus(command: Command):
 
 
 @command_router.post("/register-tenant")
-async def register(command: RegisterTenant):
+async def register_tenant(command: RegisterTenant):
     send_command_to_message_bus(command=command)
-    return {"detail": "registration initiated"}
+    return {"detail": "tenant registration initiated"}
+
+
+@command_router.post("/validate-tenant-registration-email")
+async def validate_tenant_registration_email(command: ValidateTenantEmail):
+    send_command_to_message_bus(command=command)
+    return {"detail": "tenant email validation initiated"}
+
+
+@command_router.post("/register-user")
+async def register_user(command: RegisterUser):
+    send_command_to_message_bus(command=command)
+    return {"detail": "user registration initiated"}

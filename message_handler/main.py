@@ -101,8 +101,10 @@ class MessageManager:
                 log = logger.bind(message_type=type(message))
                 log.error("message is not event, nor comand")
 
+            logger.info("BEFORE MARK PROCESSED")
             # to ensure message idempotency we record message ID as processed
             await uow.processed_messages.mark_processed(message_id=message.message_id)
+            logger.info("AFTER MARK PROCESSED")
 
     async def _handle_event(
         self: "MessageManager",
@@ -121,6 +123,9 @@ class MessageManager:
         command: Command,
     ) -> None:
         handler = self._command_handlers.get(command.type_name)
+
+        log = logger.bind(command_type=command.type_name)
+        log.bind(handler=handler)
 
         if handler:
             await handler(unit_of_work=unit_of_work, command=command)
@@ -145,7 +150,6 @@ class Application:
             try:
                 message = self._message_bus.get_message()
                 await self._message_manager.handle_message(message=message)
-
             except MessageBusConsumeError as e:
                 log = logger.bind(read_error=e.consume_error)
                 log.error("MessageBusReadError")

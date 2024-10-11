@@ -87,7 +87,7 @@ async def main(consumer):
                 log = logger.bind(event=message)
 
                 if isinstance(message, Event):
-                    handlers = EVENT_HANDLERS.get(message.name, [])
+                    handlers = EVENT_HANDLERS.get(message.type_name, [])
 
                     async with pool.acquire() as connection:
                         async with connection.transaction():

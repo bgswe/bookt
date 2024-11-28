@@ -113,6 +113,10 @@ class MessageManager:
     ) -> None:
         handlers = self._event_handlers.get(event.type_name)
 
+        log = logger.bind(event_type=event.type_name)
+        log = log.bind(handlers=handlers)
+        log.info("HELLO FROM _handle_event")
+
         if handlers:
             for handler in handlers:
                 await handler(unit_of_work=unit_of_work, event=event)

@@ -183,6 +183,7 @@ async def create_and_start_app():
                     outbox=PostgresOutbox(),
                     repository=PostgresEventStoreFactory(
                         event_store_kwargs={
+                            # TODO: Source this config from files
                             "singleton_config": {
                                 "TenantRegistrar": "d77e1fc0-488b-4cc7-a264-528514ddaa09",
                                 "UserRegistrar": "6a8782b5-8d7b-404c-b0e6-8457011bc8e7",

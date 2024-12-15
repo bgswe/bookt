@@ -1,4 +1,5 @@
 import pickle
+from typing import Annotated
 
 from bookt_domain.model.commands import (
     RegisterTenant,
@@ -8,7 +9,7 @@ from bookt_domain.model.commands import (
 from cosmos.domain import Command
 
 # from fastapi import APIRouter, Depends
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 
 # from api.dependencies import jwt_bearer
 from api.producer import producer
@@ -42,18 +43,55 @@ def send_command_to_message_bus(command: Command):
 
 
 @command_router.post("/register-tenant")
-async def register_tenant(command: RegisterTenant):
+async def register_tenant(
+    command: Annotated[
+        RegisterTenant,
+        Body(
+            examples=[
+                {
+                    "tenant_id": "39f8ccdc-97b3-4bb7-ae6b-8a75ea5cabff",
+                    "tenant_name": "Tenant ABC",
+                    "tenant_registration_email": "tenant@example.com",
+                }
+            ],
+        ),
+    ],
+):
     send_command_to_message_bus(command=command)
     return {"detail": "tenant registration initiated"}
 
 
 @command_router.post("/validate-tenant-registration-email")
-async def validate_tenant_registration_email(command: ValidateTenantEmail):
+async def validate_tenant_registration_email(
+    command: Annotated[
+        ValidateTenantEmail,
+        Body(
+            examples=[
+                {
+                    "validation_key": "7933bc0b-bd7a-4d1b-bbef-bf4659335dc7.8c109128d0a841a683bcf64ea3fde5d4",
+                }
+            ],
+        ),
+    ],
+):
     send_command_to_message_bus(command=command)
     return {"detail": "tenant email validation initiated"}
 
 
 @command_router.post("/register-user")
-async def register_user(command: RegisterUser):
+async def register_user(
+    command: Annotated[
+        RegisterUser,
+        Body(
+            examples=[
+                {
+                    "tenant_id": "39f8ccdc-97b3-4bb7-ae6b-8a75ea5cabff",
+                    "user_id": "a14e84d0-882a-411b-bf88-841387832c58",
+                    "email": "new_user@example.com",
+                }
+            ],
+        ),
+    ],
+):
     send_command_to_message_bus(command=command)
     return {"detail": "user registration initiated"}

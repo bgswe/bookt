@@ -101,10 +101,8 @@ class MessageManager:
                 log = logger.bind(message_type=type(message))
                 log.error("message is not event, nor comand")
 
-            logger.info("BEFORE MARK PROCESSED")
             # to ensure message idempotency we record message ID as processed
             await uow.processed_messages.mark_processed(message_id=message.message_id)
-            logger.info("AFTER MARK PROCESSED")
 
     async def _handle_event(
         self: "MessageManager",
@@ -115,7 +113,7 @@ class MessageManager:
 
         log = logger.bind(event_type=event.type_name)
         log = log.bind(handlers=handlers)
-        log.info("HELLO FROM _handle_event")
+        log.debug("EVENT HANDLER")
 
         if handlers:
             for handler in handlers:
@@ -130,6 +128,7 @@ class MessageManager:
 
         log = logger.bind(command_type=command.type_name)
         log.bind(handler=handler)
+        log.debug("COMMAND HANDLER")
 
         if handler:
             await handler(unit_of_work=unit_of_work, command=command)
@@ -182,7 +181,14 @@ async def create_and_start_app():
                     pool=pool,
                     processed_message_repository=PostgresProcessedMessageRepository(),
                     outbox=PostgresOutbox(),
-                    repository=PostgresEventStoreFactory(),
+                    repository=PostgresEventStoreFactory(
+                        event_store_kwargs={
+                            "singleton_config": {
+                                "TenantRegistrar": "d77e1fc0-488b-4cc7-a264-528514ddaa09",
+                                "UserRegistrar": "6a8782b5-8d7b-404c-b0e6-8457011bc8e7",
+                            }
+                        }
+                    ),
                 ),
                 event_handlers=EVENT_HANDLERS,
                 command_handlers=COMMAND_HANDLERS,

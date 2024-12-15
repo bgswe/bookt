@@ -49,7 +49,6 @@ async def register_tenant(
         Body(
             examples=[
                 {
-                    "tenant_registration_id": "7933bc0b-bd7a-4d1b-bbef-bf4659335dc7",
                     "tenant_id": "39f8ccdc-97b3-4bb7-ae6b-8a75ea5cabff",
                     "tenant_name": "Tenant ABC",
                     "tenant_registration_email": "tenant@example.com",
@@ -69,7 +68,7 @@ async def validate_tenant_registration_email(
         Body(
             examples=[
                 {
-                    "tenant_registration_id": "7933bc0b-bd7a-4d1b-bbef-bf4659335dc7",
+                    "validation_key": "7933bc0b-bd7a-4d1b-bbef-bf4659335dc7.8c109128d0a841a683bcf64ea3fde5d4",
                 }
             ],
         ),
@@ -86,8 +85,8 @@ async def register_user(
         Body(
             examples=[
                 {
-                    "user_id": "a14e84d0-882a-411b-bf88-841387832c58",
                     "tenant_id": "39f8ccdc-97b3-4bb7-ae6b-8a75ea5cabff",
+                    "user_id": "a14e84d0-882a-411b-bf88-841387832c58",
                     "email": "new_user@example.com",
                 }
             ],

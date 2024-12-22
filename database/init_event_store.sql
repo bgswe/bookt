@@ -16,5 +16,5 @@ CREATE TABLE events
 (
     id        VARCHAR(36) PRIMARY KEY,
     stream_id VARCHAR(36) NOT NULL,
-    data      BYTEA NOT NULL
+    data      JSONB NOT NULL
 );

@@ -1,5 +1,4 @@
 import asyncio
-from contextlib import asynccontextmanager
 
 # import asyncpg
 from fastapi import FastAPI
@@ -9,29 +8,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers.commands import command_router
 from api.routers.queries import query_router
 
-# from api.settings import settings
-
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     pool = await asyncpg.create_pool(
-#         host=settings.database_host,
-#         database=settings.database_name,
-#         user=settings.database_user,
-#         port=settings.database_port,
-#         password=settings.database_password,
-#     )
-#     app.state.pool = pool
-
-#     yield
-
-#     pool.close()
-
-
-# app = FastAPI(lifespan=lifespan)
 app = FastAPI()
 
 

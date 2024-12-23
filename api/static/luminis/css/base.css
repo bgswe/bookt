@@ -1,0 +1,8 @@
+.content-container {
+    padding: var(--bulma-block-spacing);
+}
+
+.navbar-menu {
+    padding-left: var(--bulma-block-spacing);
+    padding-right: var(--bulma-block-spacing);
+}

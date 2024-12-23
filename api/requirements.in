@@ -4,10 +4,11 @@ bookt_domain @ git+https://github.com/bgswe/bookt-domain
 fastapi
 uvicorn[standard]
 python-multipart
-pydantic[email]
 
+pydantic[email]
 pydantic_settings
+
 structlog
 
-# asyncpg
+jinja2
 confluent-kafka

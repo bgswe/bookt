@@ -1,0 +1,52 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="block">
+  <table class="table is-narrow is-fullwidth is-bordered">
+    <thead>
+      <tr>
+        <th class="is-link has-text-white">Event ID</th>
+        <th class="is-link has-text-white">Stream ID</th>
+        <th class="is-link has-text-white">Type</th>
+        <th class="is-link has-text-white">Data</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for event in events %}
+      <tr style="font-size: 14px">
+        <td>{{ event.data.message_id }}</td>
+        <td>{{ event.data.stream_id }}</td>
+        <td>{{ event.meta.type }}</td>
+        <td>
+          {% if event.data|length == 2 %}
+            <div class="">Empty</div>
+          {% else %}
+            {% if event.data|length == 3 %}
+                <span>{</span>
+            {% else %}
+                <div>{</div>
+            {% endif %}
+
+            {% for k, v in event.data.items()|sort(attribute='0') %}
+                {% if k != "message_id" and k != "stream_id" %}
+                    {% if event.data|length == 3 %}
+                        <span>&ensp;{{k}}: {{v}}</span>
+                    {% else %}
+                        <div>&emsp;{{k}}: {{v}}</div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            {% if event.data|length == 3 %}
+                <span>}</span>
+            {% else %}
+                <div>}</div>
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

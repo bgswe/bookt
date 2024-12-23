@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %} {{title}} {% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"
+    />
+    <link
+      href="{{ url_for('static', path='/luminis/css/base.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="navbar-menu">
+      <div class="navbar-start">
+        <div>
+          <span class="is-size-1">Luminis</span>
+        </div>
+      </div>
+
+      <div class="navbar-end">
+        <!-- navbar items -->
+      </div>
+    </div>
+
+    <div class="content-container">
+      {% block content %}
+      <h1>Oops, looks like you forgot to add content here buddy!</h1>
+      {% endblock content %}
+    </div>
+  </body>
+</html>

@@ -4,8 +4,6 @@ import pickle
 
 import asyncpg
 import structlog
-from bookt_domain.model.tenant import TenantRegistered
-from bookt_domain.model.user import UserCreated
 from confluent_kafka import Consumer
 from cosmos.domain import Event
 
@@ -23,19 +21,6 @@ conf = {
 }
 
 consumer = Consumer(conf)
-
-
-async def insert_new_account(
-    event: TenantRegistered,
-    connection: asyncpg.Connection,
-):
-    await connection.execute(
-        """
-        INSERT INTO tenant(id, name) VALUES($1, $2)
-    """,
-        str(event.stream_id),
-        event.tenant_name,
-    )
 
 
 async def insert_new_user(

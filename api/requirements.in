@@ -10,5 +10,6 @@ pydantic_settings
 
 structlog
 
+asyncpg
 jinja2
 confluent-kafka

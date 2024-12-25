@@ -10,6 +10,8 @@ anyio==4.4.0
     # via
     #   starlette
     #   watchfiles
+asyncpg==0.30.0
+    # via -r requirements.in
 bcrypt==4.2.0
     # via bookt-domain
 bookt-domain @ git+https://github.com/bgswe/bookt-domain

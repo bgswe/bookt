@@ -16,5 +16,6 @@ CREATE TABLE events
 (
     id        VARCHAR(36) PRIMARY KEY,
     stream_id VARCHAR(36) NOT NULL,
+    created   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     data      JSONB NOT NULL
 );

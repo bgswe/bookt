@@ -1,3 +1,20 @@
+.flex {
+    display: flex;
+    gap: var(--bulma-block-spacing);
+}
+
+.justify-right {
+    justify-content: right;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.align-start {
+    align-items: start;
+}
+
 .content-container {
     padding: var(--bulma-block-spacing);
 }

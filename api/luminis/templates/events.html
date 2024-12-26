@@ -1,6 +1,39 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="block">
+    <form method="GET">
+        <div class="flex justify-right align-start">
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label" style="width: 100px;">
+                        Event Type
+                    </label>
+                </div>
+
+                <div class="field-body">
+                    <div class="field is-narrow">
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="event_type">
+                                    <option value="" selected hidden>Select a Type</option>
+                                    {% for type in types %}
+                                        <option>{{type}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="button is-link">
+                Filter
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="block">
   <table class="table is-narrow is-fullwidth is-bordered">
     <thead>
       <tr>
@@ -48,9 +81,6 @@
       {% endfor %}
     </tbody>
   </table>
-
-  <div class="">
-    {{types}}
-  </div>
 </div>
+
 {% endblock %}

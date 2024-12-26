@@ -40,7 +40,12 @@ services:
     ports:
       - 8080:8080
     environment:
-      KAFKA_HOST: kafka:9092
+      - KAFKA_HOST=$KAFKA_HOST
+      - EVENT_STORE_HOST=$EVENT_STORE_HOST
+      - EVENT_STORE_NAME=$EVENT_STORE_NAME
+      - EVENT_STORE_USER=$EVENT_STORE_USER
+      - EVENT_STORE_PASSWORD=$EVENT_STORE_PASSWORD
+      - EVENT_STORE_PORT=5432
     depends_on:
       - postgres
       - kafka

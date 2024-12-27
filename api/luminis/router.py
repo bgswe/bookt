@@ -11,11 +11,13 @@ templates = Jinja2Templates(directory="api/luminis/templates")
 
 @luminis_router.get("", response_class=HTMLResponse)
 async def read_item(request: Request):
+    event_type = request.query_params.get("event_type")
+
     return templates.TemplateResponse(
         request=request,
         name="events.html",
         context={
-            "events": await get_event_list(),
+            "events": await get_event_list(event_type=event_type),
             "types": await get_unique_event_types(),
         },
     )

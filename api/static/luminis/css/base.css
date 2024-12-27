@@ -15,6 +15,10 @@
     align-items: start;
 }
 
+.align-end {
+    align-items: end;
+}
+
 .content-container {
     padding: var(--bulma-block-spacing);
 }
@@ -22,4 +26,8 @@
 .navbar-menu {
     padding-left: var(--bulma-block-spacing);
     padding-right: var(--bulma-block-spacing);
+}
+
+.margin-bottom-0 {
+    margin-bottom: 0 !important;
 }

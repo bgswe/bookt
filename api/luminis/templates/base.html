@@ -22,7 +22,40 @@
       </div>
 
       <div class="navbar-end">
-        <!-- navbar items -->
+            <div class="flex justify-right align-center">
+                <form method="GET" class="flex align-center">
+                    <div class="is-horizontal field margin-bottom-0">
+                        <div class="field-label flex align-center">
+                            <label class="label">
+                                Event Type:
+                            </label>
+                        </div>
+
+                        <div class="field is-narrow">
+                            <div class="control">
+                                <div class="select">
+                                    <select name="event_type">
+                                        <option value="" hidden {% if not selected_event_type %}selected="selected"{% endif %}>Select a Type</option>
+                                        {% for type in types %}
+                                            <option {% if type == selected_event_type %}selected="selected"{% endif %}>{{type}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="button">
+                        Filter
+                    </button>
+                </form>
+
+                <a href="?">
+                    <button class="button">
+                        Clear
+                    </button>
+                </a>
+            </div>
       </div>
     </div>
 

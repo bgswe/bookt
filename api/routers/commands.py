@@ -4,7 +4,9 @@ from typing import Annotated
 from bookt_domain.model.commands import (
     RegisterTenant,
     RegisterUser,
-    ValidateTenantEmail,
+    SetUserPassword,
+    VerifyTenantEmail,
+    VerifyUserEmail,
 )
 from cosmos.domain import Command
 
@@ -61,21 +63,21 @@ async def register_tenant(
     return {"detail": "tenant registration initiated"}
 
 
-@command_router.post("/validate-tenant-registration-email")
-async def validate_tenant_registration_email(
+@command_router.post("/verify-tenant-registration-email")
+async def verify_tenant_registration_email(
     command: Annotated[
-        ValidateTenantEmail,
+        VerifyTenantEmail,
         Body(
             examples=[
                 {
-                    "validation_key": "7933bc0b-bd7a-4d1b-bbef-bf4659335dc7.8c109128d0a841a683bcf64ea3fde5d4",
+                    "verification_key": "7933bc0b-bd7a-4d1b-bbef-bf4659335dc7.8c109128d0a841a683bcf64ea3fde5d4",
                 }
             ],
         ),
     ],
 ):
     send_command_to_message_bus(command=command)
-    return {"detail": "tenant email validation initiated"}
+    return {"detail": "tenant email verification initiated"}
 
 
 @command_router.post("/register-user")
@@ -95,3 +97,38 @@ async def register_user(
 ):
     send_command_to_message_bus(command=command)
     return {"detail": "user registration initiated"}
+
+
+@command_router.post("/verify-user-email")
+async def verify_user_email(
+    command: Annotated[
+        VerifyUserEmail,
+        Body(
+            examples=[
+                {
+                    "verification_key": "7933bc0b-bd7a-4d1b-bbef-bf4659335dc7.8c109128d0a841a683bcf64ea3fde5d4",
+                }
+            ],
+        ),
+    ],
+):
+    send_command_to_message_bus(command=command)
+    return {"detail": "user email verification initiated"}
+
+
+@command_router.post("/set-user-password")
+async def set_user_password(
+    command: Annotated[
+        SetUserPassword,
+        Body(
+            example=[
+                {
+                    "set_password_key": "the_given_password_key",
+                    "password": "some_secure_password",
+                }
+            ]
+        ),
+    ]
+):
+    send_command_to_message_bus(command=command)
+    return {"detail": "user password was set"}

@@ -1,7 +1,6 @@
 from time import time
 from uuid import UUID
 
-import bcrypt
 import jwt
 
 from api.settings import settings
@@ -61,13 +60,3 @@ def decode_refresh_token(token: str):
         raise ExpiredToken
     except jwt.InvalidTokenError:
         raise InvalidToken
-
-
-def is_password_correct(
-    password: str,
-    hash: str,
-) -> bool:
-    return bcrypt.checkpw(
-        password.encode("utf-8"),
-        hash.encode("utf-8"),
-    )

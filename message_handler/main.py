@@ -5,10 +5,17 @@ from typing import Any, Callable, Protocol
 
 import asyncpg
 import structlog
-from bookt_domain.model.command_handlers import COMMAND_HANDLERS
+from bookt_domain.model import command_handlers
 from bookt_domain.model.event_handlers import EVENT_HANDLERS
 from confluent_kafka import Consumer
-from cosmos import Command, Event, Message, UnitOfWork, UnitOfWorkFactory
+from cosmos import (
+    Command,
+    Event,
+    Message,
+    UnitOfWork,
+    UnitOfWorkFactory,
+    default_handlers,
+)
 from cosmos.contrib.pg import (
     PostgresEventStoreFactory,
     PostgresOutbox,
@@ -111,13 +118,14 @@ class MessageManager:
     ) -> None:
         handlers = self._event_handlers.get(event.type_name)
 
-        log = logger.bind(event_type=event.type_name)
-        log = log.bind(handlers=handlers)
-        log.debug("EVENT HANDLER")
-
         if handlers:
             for handler in handlers:
-                await handler(unit_of_work=unit_of_work, event=event)
+                try:
+                    await handler(unit_of_work=unit_of_work, event=event)
+                except Exception as e:
+                    # TODO: Evaluate what to do when exception occurs
+                    log = logger.bind(exception=str(e))
+                    log.error("Error during command handler")
 
     async def _handle_command(
         self: "MessageManager",
@@ -126,12 +134,15 @@ class MessageManager:
     ) -> None:
         handler = self._command_handlers.get(command.type_name)
 
-        log = logger.bind(command_type=command.type_name)
-        log.bind(handler=handler)
-        log.debug("COMMAND HANDLER")
-
         if handler:
-            await handler(unit_of_work=unit_of_work, command=command)
+            try:
+                await handler(unit_of_work=unit_of_work, command=command)
+            except Exception as e:
+                # TODO: Evaluate what to do when exception occurs
+                log = logger.bind(exception=str(e))
+                log.error("Error during command handler")
+
+            # TODO: Emit CommandCompleted (WIP) whatever her
 
 
 class IMessageManager(Protocol):
@@ -192,11 +203,12 @@ async def create_and_start_app():
                     ),
                 ),
                 event_handlers=EVENT_HANDLERS,
-                command_handlers=COMMAND_HANDLERS,
+                command_handlers=default_handlers,
             ),
         )
 
         logger.info("starting app")
+        logger.bind(handlers=default_handlers).info("DEFAULT HANDLERS")
 
         await app.start()
 

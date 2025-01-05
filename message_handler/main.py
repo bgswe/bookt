@@ -1,11 +1,14 @@
 import asyncio
+import json
 import logging
 import pickle
 from typing import Any, Callable, Protocol
 
 import asyncpg
 import structlog
-from bookt_domain.model import command_handlers
+from bookt_domain.model import (  # currently required to auto-register handlers
+    command_handlers,
+)
 from bookt_domain.model.event_handlers import EVENT_HANDLERS
 from confluent_kafka import Consumer
 from cosmos import (
@@ -22,6 +25,7 @@ from cosmos.contrib.pg import (
     PostgresProcessedMessageRepository,
     PostgresUnitOfWork,
 )
+from cosmos.domain import CommandResult, CommandResultStatus, MessageEncoder
 
 from message_handler.settings import settings
 
@@ -75,16 +79,62 @@ class IUnitOfWorkFactory(Protocol):
         ...
 
 
+class ICommandResultPublisher(Protocol):
+    def publish(self: "ICommandResultPublisher", command_result: CommandResult):
+        ...
+
+
+class KafkaCommandResultPublisher:
+    def __init__(self):
+        from confluent_kafka import Producer
+
+        from message_handler.settings import settings
+
+        conf = {
+            "bootstrap.servers": settings.kafka_host,
+        }
+
+        self._producer = Producer(conf)
+
+    def _delivery_report(self, err, msg):
+        """
+        Called once for each message produced to indicate delivery result.
+        Triggered by poll() or flush().
+        """
+
+        if err is not None:
+            print("Message delivery failed: {}".format(err))
+        else:
+            print("Message delivered to {} [{}]".format(msg.topic(), msg.partition()))
+
+    def publish(self, command_result: CommandResult):
+        result_json = json.dumps(
+            command_result.model_dump(),
+            cls=MessageEncoder,
+        )
+
+        logger.bind(cmd_result=result_json).info("CMD RESULT")
+
+        self._producer.produce(
+            "command_results",
+            key=str(command_result.message_id),
+            value=result_json,
+            callback=self._delivery_report,
+        )
+
+
 class MessageManager:
     def __init__(
         self: "MessageManager",
         unit_of_work_factory: IUnitOfWorkFactory,
         event_handlers: dict[str, list[Callable]],
         command_handlers: dict[str, Callable],
+        command_result_publisher: ICommandResultPublisher,
     ):
         self._uow_factory = unit_of_work_factory
         self._event_handlers = event_handlers
         self._command_handlers = command_handlers
+        self._command_result_publisher = command_result_publisher
 
     async def handle_message(self: "MessageManager", message: Message) -> None:
         # enable ability to run ancillary code after command handled, under single transaction
@@ -142,7 +192,13 @@ class MessageManager:
                 log = logger.bind(exception=str(e))
                 log.error("Error during command handler")
 
-            # TODO: Emit CommandCompleted (WIP) whatever her
+            self._command_result_publisher.publish(
+                command_result=CommandResult(
+                    command_id=command.message_id,
+                    command_name=command.type_name,
+                    status=CommandResultStatus.SUCCESS,
+                )
+            )
 
 
 class IMessageManager(Protocol):
@@ -160,6 +216,7 @@ class Application:
         self._message_manager = message_manager
 
     async def start(self):
+        # TODO: Is this how we should be starting the application?
         while True:
             try:
                 message = self._message_bus.get_message()
@@ -204,6 +261,7 @@ async def create_and_start_app():
                 ),
                 event_handlers=EVENT_HANDLERS,
                 command_handlers=default_handlers,
+                command_result_publisher=KafkaCommandResultPublisher(),
             ),
         )
 

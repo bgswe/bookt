@@ -187,18 +187,22 @@ class MessageManager:
         if handler:
             try:
                 await handler(unit_of_work=unit_of_work, command=command)
-            except Exception as e:
-                # TODO: Evaluate what to do when exception occurs
-                log = logger.bind(exception=str(e))
-                log.error("Error during command handler")
 
-            self._command_result_publisher.publish(
-                command_result=CommandResult(
-                    command_id=command.message_id,
-                    command_name=command.type_name,
-                    status=CommandResultStatus.SUCCESS,
+                self._command_result_publisher.publish(
+                    command_result=CommandResult(
+                        command_id=command.message_id,
+                        command_name=command.type_name,
+                        status=CommandResultStatus.SUCCESS,
+                    )
                 )
-            )
+            except Exception as e:
+                self._command_result_publisher.publish(
+                    command_result=CommandResult(
+                        command_id=command.message_id,
+                        command_name=command.type_name,
+                        status=CommandResultStatus.FAILURE,
+                    )
+                )
 
 
 class IMessageManager(Protocol):

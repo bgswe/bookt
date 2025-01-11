@@ -1,19 +1,30 @@
-import WebSocket from "ws";
+import WebSocket from 'ws'
 
-import logger from "./logger"
+import logger from './logger'
 
-const wss = new WebSocket.Server({ port: 8081 })
+type WebsocketMessage = ArrayBuffer | Blob | Buffer | Buffer[]
 
-wss.on('connection', (ws: WebSocket) => {
-    logger.info("new client connected")
+class BooktWebsocket {
+  wss: WebSocket.Server = null
+  open = false
 
-    ws.on('message', (message: string) => {
-        logger.info(`received message: ${message}`)
+  constructor(port: number) {
+    this.wss = new WebSocket.Server({ port })
 
-        ws.send(`server received your message: ${message}`)
+    this.wss.on('connection', (wss: WebSocket) => {
+      wss.on('message', this.handleMessage)
+      wss.on('close', this.close)
     })
+  }
 
-    ws.on('close', () => {
-        logger.info("client disconnected")
-    })
-});
+  handleMessage(message: WebsocketMessage): void {
+    logger.info('handle message')
+    logger.info(message)
+  }
+
+  close(): void {
+    logger.info('client connection closed')
+  }
+}
+
+new BooktWebsocket(8081)
